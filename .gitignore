@@ -165,9 +165,9 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-data/
-assets/
-exports/
+/data/
+/assets/
+/exports/
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
