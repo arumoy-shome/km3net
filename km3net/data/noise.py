@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
+from km3net.utils import DATADIR
 import os
 import re
 
-DATAFILE = "data/raw/noise.csv"
+DATAFILE = DATADIR + "/raw/noise.csv"
 
 def load():
     """
@@ -56,7 +57,7 @@ def read_positions(filename, pmt2index=lambda pmt: pmt - 1):
 
     return positions
 
- def add_label(df):
+def add_label(df):
     """
     In: df -> (n, m) pandas dataframe, this should ideally be the raw noise dataset.
     Out: (n, m+1) pandas dataframe with one new column representing the label.
@@ -71,8 +72,8 @@ def rename_columns(df):
     Out: (n, m) pandas dataframe with the columns renamed in snakecase.
     """
     df = df.rename(columns={'dom id': 'dom_id', 'pmt id': 'pmt_id',
-    'time-over-threshold': 'tot', 'x': 'pos_x', 'y': 'pos_y', 'z':
-    'pos_z', 'dx': 'dir_x', 'dy': 'dir_y', 'dz': 'dir_z'})
+                            'time-over-threshold': 'tot', 'x': 'pos_x', 'y': 'pos_y', 'z':
+                            'pos_z', 'dx': 'dir_x', 'dy': 'dir_y', 'dz': 'dir_z'})
 
     return df
 
