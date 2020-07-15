@@ -1,5 +1,16 @@
 import pandas as pd
-from data import data
+
+def load(path):
+    """
+    In: path -> Str, path to datafile
+    Out: frame representing the processed data. Returns None if
+    expectations are not met.
+    Expects: `path` to exist.
+    """
+    if os.path.isfile(path):
+        return pd.read_csv(path)
+    else:
+        print('{0} does not exist.'.format(path))
 
 def get_timeslice_with_hits(n=1, index=False, largest=True, data):
     """

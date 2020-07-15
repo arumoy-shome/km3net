@@ -1,22 +1,7 @@
 import pandas as pd
 import numpy as np
-from km3net.utils import DATADIR
 import os
 import re
-
-DATAFILE = DATADIR + "/raw/noise.csv"
-
-def load():
-    """
-    In: None
-    Out: frame representing the raw noise dataset (generated using
-    k40gen). None if expectations are not satisfied.
-    Expects: 'data/raw/noise.csv' to exist.
-    """
-    if os.path.isfile(DATAFILE):
-        return pd.read_csv(DATAFILE)
-    else:
-        print('{0} does not exist.'.format(DATAFILE))
 
 def add_positions(df):
     """
@@ -89,15 +74,13 @@ def transform_pmt_id_scheme(df):
 
     return df
 
-def process(write=False):
+def process(df):
     """
-    In: write -> Bool, write frame to disk as
-    'data/processed/noise.csv'. Defaults to False.
+    In: df -> frame, ideally this should be the raw noise dataset.
     Out: (n, m+4) pandas dataframe with the positions and the label
     columns added, columns renamed and pmt_id changed to the local
     scheme.
     """
-    df = load()
     df = add_positions(df)
     df = add_label(df)
     df = rename_columns(df)

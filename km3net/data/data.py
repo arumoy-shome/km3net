@@ -18,22 +18,7 @@ transformations to create a dataset of their liking.
 
 import pandas as pd
 from km3net.data import noise, hits
-from km3net.utils import DATADIR
 import os
-
-DATAFILE = DATADIR + "/processed/data.csv"
-
-def load():
-    """
-    In: None
-    Out: frame representing the processed data. Returns None if
-    expectations are not met.
-    Expects: 'data/processed/data.csv' to exist.
-    """
-    if os.path.isfile(DATAFILE):
-        return pd.read_csv(DATAFILE)
-    else:
-        print('{0} does not exist.'.format(DATAFILE))
 
 def add_timeslices(df, duration=15000):
     """

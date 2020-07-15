@@ -1,7 +1,5 @@
 import pandas as pd
-from km3net.utils import DATADIR
 
-DATAFILE = DATADIR + "/train/slice-615.csv"
 p1_col_names = {'pos_x': 'x1', 'pos_y': 'y1',
                 'pos_z': 'z1', 'time': 't1',
                 'label': 'l1', 'event_id': 'eid1',
@@ -10,17 +8,6 @@ p2_col_names = {'pos_x': 'x2', 'pos_y': 'y2',
                 'pos_z': 'z2', 'time': 't2',
                 'label': 'l2', 'event_id': 'eid2',
                 'timeslice': 'ts2', 'id':'id2'}
-
-def load(file=DATAFILE):
-    """
-    In: file -> Str, csv file to load.
-    Out: frame representing the training data.
-    Expectations: expects `file` to be a csv file without headers.
-    """
-    if os.path.file(file):
-        return pd.read_csv(file)
-    else:
-        print('{0} does not exist.'.format(file))
 
 def add_label(df):
     """
@@ -67,8 +54,7 @@ def process(df, drop=True, write=False):
     drop -> Bool, drop columns not required for training. They are: 'l1',
     'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'.
     write -> Truthy, if string of len > 0 then use it as filename and save
-    frame to disk. Note that the filename should be relative to DATADIR. Use
-    km3net.utils.DATADIR to get the correct absolute path.
+    frame to disk. Use km3net.utils.DATADIR to get the correct absolute path.
     Out: frame, 'exploded', related label added, unwanted columns dropped.
     """
     df = explode(df)
@@ -76,6 +62,6 @@ def process(df, drop=True, write=False):
     df = df.drop(columns=['l1', 'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'])
 
     if write and len(write) > 0:
-        df.to_csv(DATADIR + write, index=False, header=False)
+        df.to_csv(write, index=False, header=False)
 
     return df

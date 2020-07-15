@@ -1,20 +1,6 @@
 import pandas as pd
 import os
 
-DATAFILE = "data/raw/events.h5"
-
-def load():
-    """
-    In: None
-    Out: frame, frame tuple representing the mc_info and mc_hits
-    tables respectively. None if expectations are not met.
-    Expects: 'data/raw/events.h5' to exist.
-    """
-    if os.path.isfile(DATAFILE):
-        return pd.read_hdf(DATAFILE, key='/data/mc_hits')
-    else:
-        print('{0} does not exist.'.format(DATAFILE))
-
 def add_label(df):
     """
     In: df -> (n, m) pandas dataframe, this should ideally be the raw hits dataset.
@@ -65,14 +51,12 @@ def transform_pmt_id_scheme(df):
 
     return df
 
-def process(write=False):
+def process(df):
     """
-    In: write -> Bool, write frame to disk as
-    'data/processed/hits.csv'. Defaults to False.
+    In: df -> frame, ideally this should be the raw hits dataset (mc_hits).
     Out: (n, m+2) pandas dataframe with the label and event_id columns
     added, columns renamed and pmt_id changed to the local scheme.
     """
-    df = load()
     df = rename_columns(df)
     df = add_label(df)
     df = add_event_id(df)
