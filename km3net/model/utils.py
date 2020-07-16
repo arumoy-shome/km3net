@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score
 from km3net.model.data import CSVDataset
@@ -16,9 +17,9 @@ def prepare_data(path):
 
     return train_dl, test_dl
 
-def train(data, model, criterion, optimizer, epochs=10):
+def train(loader, model, criterion, optimizer, epochs=10):
     """
-    In: data -> DataLoader, iterable training data.
+    In: loader -> DataLoader, iterable training data.
     model -> Module, the model to train.
     criterion -> The loss function to use.
     optimizer -> The optimizer to use.
@@ -26,16 +27,25 @@ def train(data, model, criterion, optimizer, epochs=10):
     Out: None
     """
     for epoch in range(epochs):
-        for i, (inputs, targets) in enumerate(data):
+        running_loss = 0.0
+        for i, (inputs, targets) in enumerate(loader):
+            inputs, targets = inputs.to(device), targets.to(device)
             optimizer.zero_grad()
             yhat = model(inputs)
             loss = criterion(yhat, targets)
             loss.backward()
             optimizer.step()
 
-def test(data, model):
+            # print stats
+            running_loss += loss.item()
+            if i % 2000 === 1999: # print every 2000 mini-batches
+                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss
+                    / 2000))
+                running_loss = 0.0
+
+def test(loader, model):
     predictions, actuals = list(), list()
-    for i, (inputs, targets) in enumerate(data):
+    for i, (inputs, targets) in enumerate(loader):
         yhat = model(inputs)
         yhat = yhat.detach().numpy()
         yhat = yhat.round()
@@ -48,3 +58,12 @@ def test(data, model):
     acc = accuracy_score(actuals, predictions)
 
     return acc
+
+def get_device():
+    """
+    In: None
+    Out: torch.device, 'cuda' if available else 'cpu'
+    """
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+    return device

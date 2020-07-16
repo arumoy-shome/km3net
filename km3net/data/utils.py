@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 def load(path):
     """
@@ -12,12 +13,12 @@ def load(path):
     else:
         print('{0} does not exist.'.format(path))
 
-def get_timeslice_with_hits(n=1, index=False, largest=True, data):
+def get_timeslice_with_hits(data, n=1, index=False, largest=True):
     """
+    data -> frame, ideally should be the processed dataset
     In: n-> Int, number of timeslices. Defaults to 1.
     index -> Bool, return only the indices.
     largest -> Bool, return the largest timeslices. Else return the smallest.
-    data -> frame, ideally should be the processed dataset
     Out: frame representing the n largest timeslice.
     """
     df = data.groupby('timeslice', as_index=False).count()
