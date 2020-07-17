@@ -1,4 +1,4 @@
-from torch.nn import Linear, ReLU, Sigmoid, Module, BCELoss
+from torch.nn import Linear, ReLU, Sigmoid, Module
 from torch.nn.init import kaiming_uniform_, xavier_uniform_
 
 class MLP(Module):
