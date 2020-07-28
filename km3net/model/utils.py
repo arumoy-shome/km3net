@@ -12,8 +12,8 @@ def prepare_data(path):
     """
     dataset = CSVDataset(path)
     train, test = dataset.get_splits()
-    train_dl = DataLoader(train, batch_size=32, shuffle=True)
-    test_dl = DataLoader(test, batch_size=1024, shuffle=False)
+    train_dl = DataLoader(train, batch_size=16, shuffle=True)
+    test_dl = DataLoader(test, batch_size=32, shuffle=False)
 
     return train_dl, test_dl
 
@@ -27,7 +27,6 @@ def train(loader, model, criterion, optimizer, epochs=10):
     Out: None
     """
     device = get_device()
-    model.to(device)
     for epoch in range(epochs):
         running_loss = 0.0
         for i, (inputs, targets) in enumerate(loader):
@@ -41,25 +40,22 @@ def train(loader, model, criterion, optimizer, epochs=10):
             # print stats
             running_loss += loss.item()
             if i % 2000 == 1999: # print every 2000 mini-batches
-                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss
-                    / 2000))
+                print('[%d, %5d] loss: %.3f' % (epoch, i, running_loss / 2000))
                 running_loss = 0.0
 
+@torch.no_grad()
 def test(loader, model):
-    predictions, actuals = list(), list()
+    device = get_device()
+    correct = 0.0
     for i, (inputs, targets) in enumerate(loader):
+        inputs, targets = inputs.to(device), targets.to(device)
         yhat = model(inputs)
-        yhat = yhat.detach().numpy()
-        yhat = yhat.round()
-        actual = targets.numpy()
-        actual = actual.reshape((len(actual), 1))
-        predictions.append(yhat)
-        actuals.append(actual)
+        correct += (yhat.round() == targets).float().sum() # per minibatch
+        # print stats
+        if i % 2000 == 1999:
+            print('[{0}, {1}] correct: {2}'.format(1, i+1, correct))
 
-    predictions, actuals = np.vstack(predictions), np.vstack(actuals)
-    acc = accuracy_score(actuals, predictions)
-
-    return acc
+    return correct / len(loader.dataset)
 
 def get_device():
     """
