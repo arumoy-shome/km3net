@@ -1,0 +1,53 @@
+% this file is called up by thesis.tex
+% content in this file will be fed into the main document
+
+\chapter{Data Preparation} % top level followed by section, subsection
+
+% ----------------------- paths to graphics ------------------------
+
+\graphicspath{{1-introduction/figures/}}
+
+% ----------------------- contents from here ------------------------
+
+Since the KM3NeT Neutrino Telescope is still under construction, simulated data
+provided by Nikhef was used for this project. The data itself was split onto
+two parts namely \emph{events} and \emph{noise}, both of which came from
+different sources and in different formats.
+
+The \emph{events} dataset was provided as a \emph{HDF5} (Hierarchical Data
+Format) with a size of 42MB consisting of the \texttt{/data/mc\_hits} and
+\texttt{/data/mc\_info} datasets. For the purposes of this project only the
+\texttt{mc\_hits} dataset was used. As such, it was saved as a CSV file of size
+42MB for future use. An overview of the \texttt{mc\_hits} dataset (here on
+refered to as the \texttt{hits} dataset) is provided in Table
+\ref{tab:events-overview}.
+
+% \todo{TODO add `hits` dataset overview (column names, datatype and brief description).}
+
+% \todo{TODO add rationale for no time offset to `hits`}
+
+The \emph{noise} data was generated using a Python library written and
+maintained by Nikhef, \texttt{k40gen}. \texttt{k40gen.Generators(21341, 1245,
+[7000., 700., 70., 0.])} was used to create an instance of a generator where
+the first two arguments are random seeds followed by a list of rates at which
+single, double, triple and quadruple hits should be generated. The generator
+instance is then passed into \texttt{k40gen.generate\_40()} method which
+returns a (4, n) array containing (time, dom\_id, pmt\_id, tot). The position
+coordinates (ie. \texttt{x}, \texttt{y}, \texttt{z} coordinates) for each
+datapoint was provided in a \emph{positions.detx} file which was parsed using
+the Numpy Python package \cite{numpy} and added to the \emph{noise} array. The
+Python library Pandas \cite{pandas} is used to convert the array into a (n, 4)
+dataframe and save it as a 3.9GB CSV file. Table \ref{tab:noise-overview}
+presents an overview of the \texttt{noise} dataset.
+
+% \todo{TODO add `noise` dataset overview (column names, datatype and brief description).}
+
+To create the final dataset for the project, \emph{events} and \emph{noise}
+need to be combined. Both datasets were read into memory as Pandas dataframes
+and their columns were renamed consistently. The two dataframes were
+concatenated and sorted based on the \texttt{time} column. The resulting
+dataframe was saved as a 3.7GB CSV file.
+
+% ---------------------------------------------------------------------------
+% ----------------------- end of thesis sub-document ------------------------
+% ---------------------------------------------------------------------------
