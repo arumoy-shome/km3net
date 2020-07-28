@@ -6,7 +6,7 @@
 \chapter{Introduction}
 
 % the code below specifies where the figures are stored
-\graphicspath{{1-introduction/figures/}}
+\graphicspath{{./1-introduction/figures/}}
 
 % ----------------------------------------------------------------------
 %: ----------------------- introduction content ----------------------- 
@@ -32,6 +32,13 @@ the properties of the neutrino particles produced in the Earth's atmosphere
 with KM3NeT/ORCA (Oscillation Research with Cosmics in the Abyss)
 \cite{adrian2016letter}. In this paper, we talk exclusively about KM3NeT/ARCA.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{blocks.jpg}
+  \caption{Artist's impression of the ARCA detector \textit{source: https://www.km3net.org}}%
+  \label{fig:blocks}
+\end{figure}
+
 The ARCA telescope comprises of two ``blocks'' with a total volume of
 $1km^{3}$. Each block consists of 115 spherical detector units (referred to as
 DOMs henceforth) and each DOM consists of 31 Photo Multiplier Tubes (PMTs) in
@@ -39,7 +46,13 @@ various spacial arrangement. Figure \ref{fig:blocks} shows an artist's
 impression of ARCA, figure \ref{fig:doms} depicts a DOM along with the PMTs
 inside it.
 
-\section{Context}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{doms.png}
+  \caption{An optical detector (DOM) \textit{source: https://www.km3net.org}}%
+  \label{fig:doms}
+\end{figure}
+
 The PMTs are sensitive to light or photons, the analog signal for all hits
 above a certain threshold are digitized. This datapoint consists of a timestamp
 and the spatial orientation of the DOM (ie. x,y,z coordinates). The digital
@@ -106,10 +119,18 @@ This report intends to improve upon the GPU pipeline proposed by
 questions:
 
 \begin{enumerate}
-  \item{RQ1} Can the existing GPU pipeline be improved using neural networks (NNs)?
-  \item{RQ2} Which NN will produce the best results when replaced with the \emph{Pattern Matrix}?
-  \item{RQ3} Which NN will produce the best results when replaced with the \emph{Graph Community Detection} algorithm?
-  \item{RQ4} Finally, which combination of NNs will produce the best results when classifying time slices overall?
-\end{enumerate}
+  \item[\textbf{RQ1}.] \textbf{Can the existing GPU pipeline be improved using neural networks (NNs)?}
 
-\section{Research Method}
+    Specifically, improvement may be achieved by reducing the processing time
+    of the pipeline or improving the accuracy of identifying important
+    timeslices. In order to answer this research question, the following sub
+    questions are formulated.
+
+  \item[\textbf{RQ2.}] \textbf{Which NN will produce the best results when replaced with the \emph{Pattern Matrix}?}
+
+    TODO add rational
+
+  \item[\textbf{RQ3.}] \textbf{Which NN will produce the best results when replaced with the \emph{Graph Community Detection} algorithm?}
+
+    TODO add rational
+\end{enumerate}
