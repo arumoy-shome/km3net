@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.utils import shuffle
 
 p1_col_names = {'pos_x': 'x1', 'pos_y': 'y1',
                 'pos_z': 'z1', 'time': 't1',
@@ -8,6 +9,8 @@ p2_col_names = {'pos_x': 'x2', 'pos_y': 'y2',
                 'pos_z': 'z2', 'time': 't2',
                 'label': 'l2', 'event_id': 'eid2',
                 'timeslice': 'ts2', 'id':'id2'}
+
+col_names = ['x1', 'y1', 'z1', 't1', 'x2', 'y2', 'z2', 't2', 'label']
 
 def add_label(df):
     """
@@ -47,6 +50,15 @@ def explode(df):
         result = pd.concat([result, dup])
 
     return result
+
+def equalise_targets(df):
+    related = df[df['label'] == 1]
+    unrelated = df[df['label'] == 0]
+    size = min(len(related), len(unrelated))
+    eqdf = pd.concat([related, unrelated.sample(size)])
+    eqdf = shuffle(eqdf)
+
+    return eqdf
 
 def process(df, drop=True, write=False):
     """
