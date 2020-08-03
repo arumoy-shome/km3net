@@ -4,14 +4,15 @@ from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score
 from km3net.model.data import CSVDataset
 
-def prepare_data(path):
+def prepare_data(path, normalise=False):
     """
     In: path -> Str, path to data file.
     Out: Tuple, contains the train and test DataLoader iterables
     Expects: `path` to be a valid csv file.
     """
-    dataset = CSVDataset(path)
+    dataset = CSVDataset(path, normalise=normalise)
     train, test = dataset.get_splits()
+
     train_dl = DataLoader(train, batch_size=16, shuffle=True)
     test_dl = DataLoader(test, batch_size=32, shuffle=False)
 
@@ -27,6 +28,7 @@ def train(loader, model, criterion, optimizer, epochs=10):
     Out: None
     """
     device = get_device()
+    model.to(device)
     for epoch in range(epochs):
         running_loss = 0.0
         for i, (inputs, targets) in enumerate(loader):
@@ -46,6 +48,7 @@ def train(loader, model, criterion, optimizer, epochs=10):
 @torch.no_grad()
 def test(loader, model):
     device = get_device()
+    model.to(device)
     correct = 0.0
     for i, (inputs, targets) in enumerate(loader):
         inputs, targets = inputs.to(device), targets.to(device)
