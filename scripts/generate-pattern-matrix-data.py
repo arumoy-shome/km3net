@@ -7,14 +7,20 @@ import os
 
 if __name__ == "__main__":
     forward = 'n'
-    path = DATADIR + sys.argv[1]
-    frac = float(sys.argv[2])
+    path = DATADIR + input('source data file: ')
+    name = DATADIR + input('name of final data file: ')
+    equalise = input("equalise targets? [y/n]: ")
+    if equalize.lower() == 'y':
+        frac = float(input('frac: '))
+    save = input("save to disk? [y/n]: ")
 
     while not os.path.isfile(path):
         print('{0} does not exist!'.format(path))
         path = DATADIR+input('path? :')
 
-    print("data file: {0}, frac: {1}".format(path, frac))
+    print("source file: {0}".format(path))
+    print("final file: {0}".format(name))
+    print("frac: {0}".format(frac))
     master = input("proceed? [y/n]: ")
 
     if master.lower() == 'n': exit()
@@ -39,7 +45,6 @@ if __name__ == "__main__":
     print("Shape of unrelated: {0}".format(sample[sample['label'] == 0].shape))
 
     # equalize tragets
-    equalise = input("equalise targets? [y/n]: ")
     if equalise.lower() == 'y':
         print("equalizing targets...")
         sample = pm.equalise_targets(sample)
@@ -48,10 +53,8 @@ if __name__ == "__main__":
         print("Shape of related: {0}".format(sample[sample['label'] == 1].shape))
         print("Shape of unrelated: {0}".format(sample[sample['label'] == 0].shape))
 
-    save = input("save to disk? [y/n]: ")
     if save.lower() == 'y':
-        name = input("name? :")
-        sample.to_csv(DATADIR+name, index=False, header=False)
+        sample.to_csv(name, index=False, header=False)
 
     print("DONE")
 
