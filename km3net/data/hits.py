@@ -3,8 +3,14 @@ import os
 
 def add_label(df):
     """
-    In: df -> (n, m) pandas dataframe, this should ideally be the raw hits dataset.
-    Out: (n, m+1) pandas dataframe with one new column representing the label.
+    In
+    --
+    df -> (n, m) dataframe, this should ideally be the raw hits dataset.
+
+    Out
+    ---
+    df -> (n, m+1) dataframe with one new column representing the
+    label.
     """
     df["label"] = 1
 
@@ -12,9 +18,17 @@ def add_label(df):
 
 def add_event_id(df):
     """
-    In: df -> (n, m) pandas dataframe, this should be the raw hits dataset (mc_hits).
-    Expects: 'data/raw/events.h5' to be a valid file path.
-    Out: (n, m+1) hits with their corresponding event id added as a new column.
+    In
+    --
+    df -> (n, m) dataframe, this should be the raw hits dataset (mc_hits).
+
+    Expects
+    -------
+    'data/raw/events.h5' is a valid file path.
+
+    Out
+    ---
+    df -> (n, m+1) hits with their corresponding event id added as a new column.
     """
     info = pd.read_hdf("data/raw/events.h5", key="/data/mc_info")
     info["event_id"] = info.index
@@ -29,8 +43,13 @@ def add_event_id(df):
 
 def rename_columns(df):
     """
-    In: df -> (n, m) pandas dataframe, this should ideally be the raw hits dataset.
-    Out: (n, m) pandas dataframe with the columns renamed in snakecase.
+    In
+    --
+    df -> (n, m) dataframe, this should ideally be the raw hits dataset.
+
+    Out
+    ---
+    df -> (n, m) dataframe with the columns renamed in snakecase.
     """
     df = df.rename(columns={'h.dom_id': 'dom_id', 'h.pmt_id':
     'pmt_id', 'h.pos.x': 'pos_x', 'h.pos.y': 'pos_y', 'h.pos.z':
@@ -41,11 +60,15 @@ def rename_columns(df):
 
 def transform_pmt_id_scheme(df):
     """
-    In: df -> (n, m) pandas dataframe, this should ideally be the raw
-    hits dataset where the pmt_id column follows the global numbering
-    scheme.
-    Out: (n, m) pandas dataframe with pmt_id column now following the
-    local numbering scheme.
+    In
+    --
+    df -> (n, m) dataframe, this should ideally be the raw hits dataset where
+    the pmt_id column follows the global numbering scheme.
+
+    Out
+    ---
+    df -> (n, m)  dataframe with pmt_id column now following the local
+    numbering scheme.
     """
     df["pmt_id"] = df["pmt_id"] - 31 * (df["dom_id"] - 1)
 
@@ -53,9 +76,14 @@ def transform_pmt_id_scheme(df):
 
 def process(df):
     """
-    In: df -> frame, ideally this should be the raw hits dataset (mc_hits).
-    Out: (n, m+2) pandas dataframe with the label and event_id columns
-    added, columns renamed and pmt_id changed to the local scheme.
+    In
+    --
+    df -> dataframe, ideally this should be the raw hits dataset (mc_hits).
+
+    Out
+    ---
+    df -> (n, m+2)  dataframe with the label and event_id columns added,
+    columns renamed and pmt_id changed to the local scheme.
     """
     df = rename_columns(df)
     df = add_label(df)

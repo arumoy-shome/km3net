@@ -5,11 +5,19 @@ import re
 
 def add_positions(df):
     """
-    In: df -> (n, m) pandas dataframe, this should ideally be the raw noise
-    dataset without any position info.
-    Expects: data/noise.detx to be a valid file path containing
-    position coordinates of noise hits.
-    Out: (n, m+3) pandas dataframe with three new columns representing the
+    Input
+    -----
+    df -> (n, m) dataframe, this should ideally be the raw noise dataset
+    without any position info.
+
+    Expects
+    -------
+    data/raw/noise.detx to be a valid file path containing position
+    coordinates of noise hits.
+
+    Out
+    ---
+    df -> (n, m+3) dataframe with three new columns representing the
     positions.
     """
     df["pos_idx"] = 31 * (noise["dom id"] - 1) + noise["pmt id"]
@@ -22,9 +30,14 @@ def add_positions(df):
 
 def read_positions(filename, pmt2index=lambda pmt: pmt - 1):
     """
-    In: filename -> path to a detx file containing the positions of noise hits.
+    In
+    --
+    filename -> path to a detx file containing the positions of noise hits.
     pmt2index -> function to convert pmt ids to indices, set to a reasonable default.
-    Out: (n, 3) numpy array.
+
+    Out
+    ---
+    positions -> (n, 3) numpy array.
     """
     line_expr = re.compile(r"\s*(\d+)\s+(-?\d+\.\d+\s*){7}")
     float_expr = re.compile(r"-?\d+\.\d+")
@@ -44,8 +57,13 @@ def read_positions(filename, pmt2index=lambda pmt: pmt - 1):
 
 def add_label(df):
     """
-    In: df -> (n, m) pandas dataframe, this should ideally be the raw noise dataset.
-    Out: (n, m+1) pandas dataframe with one new column representing the label.
+    In
+    --
+    df -> (n, m) dataframe, this should ideally be the raw noise dataset.
+
+    Out
+    ---
+    df -> (n, m+1) dataframe with one new column representing the label.
     """
     df["label"] = 0
 
@@ -53,8 +71,13 @@ def add_label(df):
 
 def rename_columns(df):
     """
-    In: df -> (n, m) pandas dataframe, this should ideally be the raw noise dataset.
-    Out: (n, m) pandas dataframe with the columns renamed in snakecase.
+    In
+    --
+    df -> (n, m) dataframe, this should ideally be the raw noise dataset.
+
+    Out
+    --
+    df -> (n, m) dataframe with the columns renamed in snakecase.
     """
     df = df.rename(columns={'dom id': 'dom_id', 'pmt id': 'pmt_id',
                             'time-over-threshold': 'tot', 'x': 'pos_x', 'y': 'pos_y', 'z':
@@ -64,11 +87,15 @@ def rename_columns(df):
 
 def transform_pmt_id_scheme(df):
     """
-    In: df -> (n, m) pandas dataframe, this should ideally be the raw
-    noise dataset where the pmt_id column follows the global numbering
-    scheme.
-    Out: (n, m) pandas dataframe with pmt_id column now following the
-    local numbering scheme.
+    In
+    --
+    df -> (n, m) dataframe, this should ideally be the raw noise dataset where
+    the pmt_id column follows the global numbering scheme.
+
+    Out
+    ---
+    df -> (n, m) dataframe with pmt_id column now following the local
+    numbering scheme.
     """
     df["pmt_id"] = df["pmt_id"] + 1
 
@@ -76,10 +103,14 @@ def transform_pmt_id_scheme(df):
 
 def process(df):
     """
-    In: df -> frame, ideally this should be the raw noise dataset.
-    Out: (n, m+4) pandas dataframe with the positions and the label
-    columns added, columns renamed and pmt_id changed to the local
-    scheme.
+    In
+    --
+    df -> dataframe, ideally this should be the raw noise dataset.
+
+    Out
+    ---
+    df -> (n, m+4) pandas dataframe with the positions and the label columns
+    added, columns renamed and pmt_id changed to the local scheme.
     """
     df = add_positions(df)
     df = add_label(df)
