@@ -14,8 +14,13 @@ col_names = ['x1', 'y1', 'z1', 't1', 'x2', 'y2', 'z2', 't2', 'label']
 
 def add_label(df):
     """
-    In: df -> frame, should be the exploded frame.
-    Out: frame, with label column added.
+    In
+    --
+    df -> dataframe, ideally should be the "exploded" frame.
+
+    Out
+    ---
+    df -> dataframe, with label column added.
     """
     df['label'] = df['eid1'] == df['eid2']
     df['label'] = df['label'].astype(int)
@@ -24,8 +29,14 @@ def add_label(df):
 
 def explode(df):
     """
-    In: df -> (n, m) frame, ideally should be the processed dataset.
-    Out: (sum(n, 0), m*2) frame, each row paired with all other unique rows.
+    In
+    --
+    df -> (n, m) frame, ideally should be the processed dataset.
+
+    Out
+    ---
+    df -> (sum(n-1, 1), m-1*2) frame, each row paired with all other unique
+    rows.
     """
     result = pd.DataFrame()
     df['id'] = df.reset_index().index
@@ -52,6 +63,15 @@ def explode(df):
     return result
 
 def equalise_targets(df):
+    """
+    In
+    --
+    df -> (n, m) dataframe, ideally should be the "exploded" dataframe
+
+    Out
+    ---
+    df -> (l, k) dataframe, equalized targets (majority class undersampled)
+    """
     related = df[df['label'] == 1]
     unrelated = df[df['label'] == 0]
     size = min(len(related), len(unrelated))
@@ -60,14 +80,18 @@ def equalise_targets(df):
 
     return eqdf
 
-def process(df, drop=True, write=False):
+def process(df, drop=True):
     """
-    In: df -> frame, ideally should be a sample of the processed dataset.
+    In
+    --
+    df -> dataframe, ideally should be a sample of the processed dataset.
     drop -> Bool, drop columns not required for training. They are: 'l1',
     'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'.
-    write -> Truthy, if string of len > 0 then use it as filename and save
-    frame to disk. Use km3net.utils.DATADIR to get the correct absolute path.
-    Out: frame, 'exploded', related label added, unwanted columns dropped.
+
+    Out
+    ---
+    df -> dataframe, 'exploded', related label added, unwanted columns
+    dropped.
     """
     df = explode(df)
     df = add_label(df)

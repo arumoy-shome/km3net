@@ -6,9 +6,18 @@ from km3net.model.data import CSVDataset
 
 def prepare_train_data(path, normalise=False):
     """
-    In: path -> Str, path to data file.
-    Out: Tuple, contains the train and test DataLoader iterables
-    Expects: `path` to be a valid csv file.
+    In
+    --
+    path -> Str, path to data file.
+    normalise -> Bool, normalise data between [0, 1], defaults to False.
+
+    Expects
+    -------
+    `path` to be a valid csv file.
+
+    Out
+    ---
+    train_dl, test_dl -> Tuple, contains the train and test DataLoader iterables
     """
     dataset = CSVDataset(path, normalise=normalise)
     train, test = dataset.get_splits()
@@ -19,6 +28,20 @@ def prepare_train_data(path, normalise=False):
     return train_dl, test_dl
 
 def prepare_test_data(path, normalise=False):
+    """
+    In
+    --
+    path -> Str, path to data file.
+    normalise -> Bool, normalise data between [0, 1], defaults to False.
+
+    Expects
+    -------
+    `path` to be a valid csv file.
+
+    Out
+    ---
+    test_dl -> test DataLoader iterable
+    """
     dataset = CSVDataset(path, normalise=normalise)
     _, test = dataset.get_splits(n_test=1.0)
     test_dl = DataLoader(test, batch_size=32, shuffle=False)
@@ -27,12 +50,18 @@ def prepare_test_data(path, normalise=False):
 
 def train(loader, model, criterion, optimizer):
     """
-    In: loader -> DataLoader, iterable training data.
+    In
+    --
+    loader -> DataLoader, iterable training data.
     model -> Module, the model to train.
     criterion -> The loss function to use.
     optimizer -> The optimizer to use.
     epochs -> Int, number of epochs to train, defaults to 10.
-    Out: loss_values -> List, loss per epoch
+
+    Out
+    ---
+    running_loss -> Float, loss across all mini batches ie. for the entire
+    epoch
     """
     device = get_device()
     running_loss = 0.0
@@ -49,7 +78,16 @@ def train(loader, model, criterion, optimizer):
 
 def valid(loader, model, criterion):
     """
-    TODO
+    In
+    --
+    loader -> DataLoader, iterable training data.
+    model -> Module, the model to train.
+    criterion -> The loss function to use.
+
+    Out
+    ---
+    running_loss -> Float, loss across all mini batches ie. for the entire
+    epoch
     """
     device = get_device()
     running_loss = 0.0
@@ -63,22 +101,48 @@ def valid(loader, model, criterion):
 
 @torch.no_grad()
 def test(loader, model):
+    """
+    In
+    --
+    loader -> DataLoader, iterable training data.
+    model -> Module, the model to train.
+
+    Out
+    ---
+    y_true, y_pred -> Tuple, containing the true and predicted targets
+    """
     device = get_device()
-    all_yhats = torch.tensor([], device=device)
-    all_targets = torch.tensor([], device=device)
+    y_pred = torch.tensor([], device=device)
+    y_true = torch.tensor([], device=device)
     for i, (inputs, targets) in enumerate(loader):
         inputs, targets = inputs.to(device), targets.to(device)
         yhat = model(inputs)
         yhat = yhat.round()
-        all_targets = torch.cat((all_targets, targets), 0)
-        all_yhats = torch.cat((all_yhats, yhat), 0)
+        y_true = torch.cat((y_true, targets), 0)
+        y_pred = torch.cat((y_pred, yhat), 0)
 
-    all_targets = all_targets.cpu().numpy()
-    all_yhats = all_yhats.cpu().numpy()
+    y_true = y_true.cpu().numpy()
+    y_pred = y_pred.cpu().numpy()
 
-    return all_targets, all_yhats
+    return y_true, y_pred
 
 def evaluate(model, optimizer, criterion, epochs, train_dl, valid_dl, test_dl):
+    """
+    In
+    --
+    model -> Module, the model to train.
+    optimizer -> The optimizer to use.
+    criterion -> The loss function to use.
+    epochs -> Int, number of epochs to train, defaults to 10.
+    train_dl -> DataLoader, training set
+    valid_dl -> DataLoader, validation set
+    test_dl -> DataLoader, test set
+
+    Out
+    ---
+    Dict, containing the training and validation losses for all epochs,
+    predicted labels and true labels.
+    """
     train_losses = []
     valid_losses = []
     print('---')
@@ -101,8 +165,13 @@ def evaluate(model, optimizer, criterion, epochs, train_dl, valid_dl, test_dl):
 
 def get_device():
     """
-    In: None
-    Out: torch.device, 'cuda' if available else 'cpu'
+    In
+    --
+    None
+
+    Out
+    ---
+    device -> Str, 'cuda' if available else 'cpu'
     """
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 

@@ -3,9 +3,6 @@ from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import Dataset, random_split
 
 class CSVDataset(Dataset):
-    """
-    TODO
-    """
     def __init__(self, path, normalise=False):
         df = pd.read_csv(path, header=None)
         self.X = df.values[:, :-1]
