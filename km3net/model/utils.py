@@ -1,54 +1,6 @@
-import numpy as np
 import torch
-from torch.utils.data import DataLoader
-from sklearn.metrics import accuracy_score
-from km3net.model.data import CSVDataset
 
-def prepare_train_data(path, normalise=False):
-    """
-    In
-    --
-    path -> Str, path to data file.
-    normalise -> Bool, normalise data between [0, 1], defaults to False.
-
-    Expects
-    -------
-    `path` to be a valid csv file.
-
-    Out
-    ---
-    train_dl, test_dl -> Tuple, contains the train and test DataLoader iterables
-    """
-    dataset = CSVDataset(path, normalise=normalise)
-    train, test = dataset.get_splits()
-
-    train_dl = DataLoader(train, batch_size=16, shuffle=True)
-    test_dl = DataLoader(test, batch_size=16, shuffle=True)
-
-    return train_dl, test_dl
-
-def prepare_test_data(path, normalise=False):
-    """
-    In
-    --
-    path -> Str, path to data file.
-    normalise -> Bool, normalise data between [0, 1], defaults to False.
-
-    Expects
-    -------
-    `path` to be a valid csv file.
-
-    Out
-    ---
-    test_dl -> test DataLoader iterable
-    """
-    dataset = CSVDataset(path, normalise=normalise)
-    _, test = dataset.get_splits(n_test=1.0)
-    test_dl = DataLoader(test, batch_size=32, shuffle=False)
-
-    return test_dl
-
-def train(loader, model, criterion, optimizer):
+def train(loader, model, criterion, optimizer, device):
     """
     In
     --
@@ -63,12 +15,12 @@ def train(loader, model, criterion, optimizer):
     running_loss -> Float, loss across all mini batches ie. for the entire
     epoch
     """
-    device = get_device()
     running_loss = 0.0
     for i, (inputs, targets) in enumerate(loader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
         yhat = model(inputs)
+        yhat = yhat.squeeze() # (batch_size, 1) -> (batch_size,) to match targets.shape
         loss = criterion(yhat, targets)
         loss.backward()
         optimizer.step()
@@ -76,7 +28,7 @@ def train(loader, model, criterion, optimizer):
 
     return running_loss / len(loader.dataset)
 
-def valid(loader, model, criterion):
+def valid(loader, model, criterion, device):
     """
     In
     --
@@ -89,18 +41,18 @@ def valid(loader, model, criterion):
     running_loss -> Float, loss across all mini batches ie. for the entire
     epoch
     """
-    device = get_device()
     running_loss = 0.0
     for i, (inputs, targets) in enumerate(loader):
         inputs, targets = inputs.to(device), targets.to(device)
         yhat = model(inputs)
+        yhat = yhat.squeeze()
         loss = criterion(yhat, targets)
         running_loss += loss.item()
 
     return running_loss / len(loader.dataset)
 
 @torch.no_grad()
-def test(loader, model):
+def test(loader, model, device):
     """
     In
     --
@@ -111,12 +63,12 @@ def test(loader, model):
     ---
     y_true, y_pred -> Tuple, containing the true and predicted targets
     """
-    device = get_device()
     y_pred = torch.tensor([], device=device)
     y_true = torch.tensor([], device=device)
     for i, (inputs, targets) in enumerate(loader):
         inputs, targets = inputs.to(device), targets.to(device)
         yhat = model(inputs)
+        yhat = yhat.squeeze()
         yhat = yhat.round()
         y_true = torch.cat((y_true, targets), 0)
         y_pred = torch.cat((y_pred, yhat), 0)
@@ -126,7 +78,7 @@ def test(loader, model):
 
     return y_true, y_pred
 
-def evaluate(model, optimizer, criterion, epochs, train_dl, valid_dl, test_dl):
+def evaluate(model, optimizer, criterion, epochs, device, train_dl, valid_dl, test_dl):
     """
     In
     --
@@ -145,10 +97,11 @@ def evaluate(model, optimizer, criterion, epochs, train_dl, valid_dl, test_dl):
     """
     train_losses = []
     valid_losses = []
+    model.train()
     print('---')
     for epoch in range(epochs):
-        train_loss = train(train_dl, model, criterion, optimizer)
-        valid_loss = valid(valid_dl, model, criterion)
+        train_loss = train(train_dl, model, criterion, optimizer, device)
+        valid_loss = valid(valid_dl, model, criterion, device) if valid_dl else 0.
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
 
@@ -158,7 +111,8 @@ def evaluate(model, optimizer, criterion, epochs, train_dl, valid_dl, test_dl):
                 train_loss, valid_loss))
 
     print('---')
-    y_true, y_pred = test(test_dl, model)
+    model.eval()
+    y_true, y_pred = test(test_dl, model, device)
 
     return {'train_losses': train_losses, 'valid_losses': valid_losses,
             'y_true': y_true, 'y_pred': y_pred}
