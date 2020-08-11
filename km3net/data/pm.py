@@ -97,7 +97,4 @@ def process(df, drop=True):
     df = add_label(df)
     df = df.drop(columns=['l1', 'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'])
 
-    if write and len(write) > 0:
-        df.to_csv(write, index=False, header=False)
-
     return df
