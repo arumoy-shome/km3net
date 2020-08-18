@@ -1,9 +1,19 @@
 import itertools
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import roc_curve
 
-def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion Matrix',
+def confusion_matrix(cm, classes, normalize=False, title='Confusion Matrix',
         cmap=plt.cm.Blues):
+    """
+In
+--
+cm -> (n, n) Array, the confusion matrix
+classes -> List, the classes
+normalize -> Bool, normalize the data such that they add up to 100, defaults to False
+title -> Str, title of the plot
+cmap -> matplotlib.plt.cm, color map to use for the plot
+"""
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print('Confusion matrix with normalization')
@@ -30,13 +40,25 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion Matrix'
 
     return plt
 
-def plot_learning_curve(train_losses, valid_losses):
+def learning_curve(train_losses, valid_losses):
+    """
+In
+--
+train_losses -> (n,) List, training losses
+valid_losses -> (n,) List or None, validation losses
+
+Out
+---
+plt -> matplotlib.pyplot, line plot containing the training and validation losses
+"""
     plt.title('Learning Curve')
     plt.plot(train_losses)
-    plt.plot(valid_losses)
+    plt.plot(valid_losses) if valid_losses
     plt.ylabel('Loss')
     plt.xlabel('Epochs')
     plt.figure(figsize=(8,8))
 
     return plt
 
+def roc_curve(y_true, y_pred):
+    pass

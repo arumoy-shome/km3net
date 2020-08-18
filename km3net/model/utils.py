@@ -59,24 +59,34 @@ def test(loader, model, device):
     loader -> DataLoader, iterable training data.
     model -> Module, the model to train.
 
+    Expects
+    -------
+    model to return probability estimates ie. the last activation
+    function of model should be a Sigmoid
+
     Out
     ---
-    y_true, y_pred -> Tuple, containing the true and predicted targets
+    y_true, y_pred, y_pred_proba -> Tuple, containing the true
+    targets, predicted targets and probability estimate of positive
+    class
     """
     y_pred = torch.tensor([], device=device)
+    y_pred_proba = torch.tensor([], device=device)
     y_true = torch.tensor([], device=device)
     for i, (inputs, targets) in enumerate(loader):
         inputs, targets = inputs.to(device), targets.to(device)
         yhat = model(inputs)
         yhat = yhat.squeeze()
-        yhat = yhat.round()
+        yhat_label = yhat.round()
         y_true = torch.cat((y_true, targets), 0)
-        y_pred = torch.cat((y_pred, yhat), 0)
+        y_pred = torch.cat((y_pred, yhat_label), 0)
+        y_pred_proba = torch.cat((y_pred_proba, yhat), 0)
 
     y_true = y_true.cpu().numpy()
     y_pred = y_pred.cpu().numpy()
+    y_pred_proba = y_pred_proba.cpu().numpy()
 
-    return y_true, y_pred
+    return y_true, y_pred, y_pred_proba
 
 def evaluate(model, optimizer, criterion, epochs, device, train_dl, valid_dl, test_dl):
     """
@@ -92,8 +102,9 @@ def evaluate(model, optimizer, criterion, epochs, device, train_dl, valid_dl, te
 
     Out
     ---
-    Dict, containing the training and validation losses for all epochs,
-    predicted labels and true labels.
+    metrics -> Dict, containing the training and validation losses for
+    all epochs, predicted labels, true labels, probability estimate
+    of positive class and the model after training
     """
     train_losses = []
     valid_losses = []
@@ -101,9 +112,11 @@ def evaluate(model, optimizer, criterion, epochs, device, train_dl, valid_dl, te
     print('---')
     for epoch in range(epochs):
         train_loss = train(train_dl, model, criterion, optimizer, device)
-        valid_loss = valid(valid_dl, model, criterion, device) if valid_dl else 0.
         train_losses.append(train_loss)
-        valid_losses.append(valid_loss)
+
+        if valid_dl:
+            valid_loss = valid(valid_dl, model, criterion, device)
+            valid_losses.append(valid_loss)
 
         # print statistics every 5 epochs
         if epoch % 5 == 0:
@@ -112,10 +125,18 @@ def evaluate(model, optimizer, criterion, epochs, device, train_dl, valid_dl, te
 
     print('---')
     model.eval()
-    y_true, y_pred = test(test_dl, model, device)
+    y_true, y_pred, y_pred_proba = test(test_dl, model, device)
 
-    return {'train_losses': train_losses, 'valid_losses': valid_losses,
-            'y_true': y_true, 'y_pred': y_pred}
+    metrics = {
+        'train_losses': train_losses,
+        'y_true': y_true,
+        'y_pred': y_pred,
+        'y_pred_proba': y_pred_proba,
+        'model': model
+    }
+    metrics['valid_losses'] = valid_losses if valid_dl else None
+
+    return metrics
 
 def get_device():
     """
@@ -130,3 +151,41 @@ def get_device():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
     return device
+
+def save_model(model, path):
+    """
+In
+--
+model -> torch.nn, model to save
+path -> Str, path to save state_dict of model
+
+Expects
+-------
+path to be valid
+
+Out
+---
+None
+"""
+    torch.save(model.state_dict(), path)
+
+def load_model(model, path):
+    """
+In
+--
+model -> torch.nn, instance of model class to load
+path -> Str, path where model's state_dict is saved
+
+Expects
+-------
+path to be valid
+
+Out
+---
+model -> torch.nn, loaded pytorch model in eval mode
+"""
+    model = model
+    model.load_state_dict(torch.load(path))
+    model.eval()
+
+    return model
