@@ -1,0 +1,37 @@
+#+AUTHOR: Arumoy Shome
+#+TITLE: Thesis
+
+* Pattern Matrix Step
+
+** Description of existing pipeline
+Describe overview of Konrad's approach and baseline performance to
+beat.
+
+
+*** Report performance metrics
+
+** Data preparation
+
+** TODO Data exploration
+
+** Model training and evaluation
+
+* Graph Community Detection Step
+
+** Description of existing pipeline
+
+*** Report performance metrics
+
+** Data preparation
+
+** Data exploration
+
+** Model training and evaluation
+
+* Pipeline
+
+** Description of existing pipeline
+
+*** Report performance metrics
+
+** Pipeline evaluation
