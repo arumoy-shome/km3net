@@ -33,7 +33,7 @@ class MLPDataset(Dataset):
 
         return random_split(self, [train_size, test_size])
 
-def prepare_train_data(path, normalise=False):
+def prepare_train_data(path, normalise=False, n_test=0.33):
     """
     In
     --
@@ -49,7 +49,7 @@ def prepare_train_data(path, normalise=False):
     train_dl, test_dl -> Tuple, contains the train and test DataLoader iterables
     """
     dataset = MLPDataset(path, normalise=normalise)
-    train, test = dataset.get_splits()
+    train, test = dataset.get_splits(n_test)
 
     train_dl = DataLoader(train, batch_size=16, shuffle=True)
     test_dl = DataLoader(test, batch_size=16, shuffle=True)

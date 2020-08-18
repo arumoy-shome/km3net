@@ -47,7 +47,7 @@ def collate(samples):
 
     return batched_graph, torch.tensor(labels)
 
-def prepare_data(path, n=100, size=20):
+def prepare_train_data(path, n=100, size=20, n_test=0.2):
     """
     In
     --
@@ -64,12 +64,31 @@ def prepare_data(path, n=100, size=20):
     train_dl, test_dl -> Tuple, contains the train and test DataLoader iterables
     """
     dataset = GNNDataset(path, n, size)
-    train, test = dataset.get_splits()
+    train, test = dataset.get_splits(n_test)
 
-    train_dl = DataLoader(train, batch_size=16, shuffle=True,
-            collate_fn=collate)
-    test_dl = DataLoader(test, batch_size=32, shuffle=False,
-            collate_fn=collate)
+    train_dl = DataLoader(train, batch_size=16, shuffle=True, collate_fn=collate)
+    test_dl = DataLoader(test, batch_size=16, shuffle=True, collate_fn=collate)
 
     return train_dl, test_dl
 
+def prepare_test_data(path, n=100, size=20):
+    """
+In
+--
+path -> Str, path to data file.
+n -> Int, number of graphs
+size -> Int, min number of nodes in each graph
+
+Expects
+-------
+`path` to be a valid csv file.
+
+Out
+---
+test_dl -> DataLoader, test iterable
+"""
+    dataset = GNNDataset(path, n, size)
+    _, test = dataset.get_splits(n_test=1.0)
+    test_dl = DataLoader(test, batch_size=32, shuffle=False, collate_fn=collate)
+
+    return test_dl
