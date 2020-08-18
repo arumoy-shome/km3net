@@ -66,12 +66,12 @@ def test(loader, model, device):
 
     Out
     ---
-    y_true, y_pred, y_pred_proba -> Tuple, containing the true
+    y_true, y_pred, y_score -> Tuple, containing the true
     targets, predicted targets and probability estimate of positive
     class
     """
     y_pred = torch.tensor([], device=device)
-    y_pred_proba = torch.tensor([], device=device)
+    y_score = torch.tensor([], device=device)
     y_true = torch.tensor([], device=device)
     for i, (inputs, targets) in enumerate(loader):
         inputs, targets = inputs.to(device), targets.to(device)
@@ -80,13 +80,13 @@ def test(loader, model, device):
         yhat_label = yhat.round()
         y_true = torch.cat((y_true, targets), 0)
         y_pred = torch.cat((y_pred, yhat_label), 0)
-        y_pred_proba = torch.cat((y_pred_proba, yhat), 0)
+        y_score = torch.cat((y_score, yhat), 0)
 
     y_true = y_true.cpu().numpy()
     y_pred = y_pred.cpu().numpy()
-    y_pred_proba = y_pred_proba.cpu().numpy()
+    y_score = y_score.cpu().numpy()
 
-    return y_true, y_pred, y_pred_proba
+    return y_true, y_pred, y_score
 
 def evaluate(model, optimizer, criterion, epochs, device, train_dl, valid_dl, test_dl):
     """
@@ -118,20 +118,23 @@ def evaluate(model, optimizer, criterion, epochs, device, train_dl, valid_dl, te
             valid_loss = valid(valid_dl, model, criterion, device)
             valid_losses.append(valid_loss)
 
-        # print statistics every 5 epochs
-        if epoch % 5 == 0:
+        # print statistics every epoch
+        if valid_dl:
             print("epochs: %d, train loss: %.3f, valid loss: %.3f" % (epoch,
                 train_loss, valid_loss))
+        else:
+            print("epochs: %d, train loss: %.3f, valid loss: --" % (epoch,
+                train_loss))
 
     print('---')
     model.eval()
-    y_true, y_pred, y_pred_proba = test(test_dl, model, device)
+    y_true, y_pred, y_score = test(test_dl, model, device)
 
     metrics = {
         'train_losses': train_losses,
         'y_true': y_true,
         'y_pred': y_pred,
-        'y_pred_proba': y_pred_proba,
+        'y_score': y_score,
         'model': model
     }
     metrics['valid_losses'] = valid_losses if valid_dl else None
