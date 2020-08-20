@@ -1,0 +1,35 @@
+#+TITLE: Km3NeT Logbook
+#+AUTHOR: Arumoy Shome
+#+DATE: August 20, 2020
+
+* Pattern Matrix
+  In this section strategies are explored to replace the /Hit
+  Correlation/ step of the existing data processing pipeline.
+  
+** Approach
+   Two approaches are considered:
+   1. Use a MLP to predict if two given points are /causally related/
+      or not.
+   2. Approach this problem as an unsupervised learning task and use
+      *clustering* techniques to determine related points.
+
+*** MLP to predict /causally related/ points
+    + causally related :: two points are causally related to each
+      other if they occur close in space and time.
+
+    This approach requires the following sub tasks:
+    1. *Preparation of dataset*: Given the "main dataset" a new
+       dataset (henceforth referred to as the "pattern matrix
+       dataset") is to be created such that each row contains the
+       =x,y,z and time= features for all unique pairs of points.
+    2. *Creation of labels*: Using the /mc_info/ table, we can
+       determine if two points are /related/ if they originated from
+       the same "event" ie. they have the same =event_id=.
+
+** Creation of "Pattern Matrix" Dataset
+** Experiments
+   This section tracks all experiments which were conducted in order
+   to obtain the final model to replace the _pattern matrix_ algorithm
+   of the existing data processing pipueline.
+*** TODO Experiment 2.
+
