@@ -154,4 +154,5 @@ def evaluate(y_true, y_pred, y_score, train_losses, valid_losses, model):
     print('ROC AUC: %.3f' % roc_auc)
     print('Precision Recall AUC: %.3f' % pr_auc)
     print('F1 Score: %.3f' % skmetrics.f1_score(y_true, y_pred))
+    print('F2 Score: %.3f' % skmetrics.fbeta_score(y_true, y_pred, beta=2.0))
 
