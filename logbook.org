@@ -101,11 +101,13 @@
      over varying dataset sizes. See [[*Evaluation][Evaluation]] for details on metrics
      used.
 
-     | id | variant | epochs | #samples (training) | accuracy | recall | precision |   F1 |    F2 | ROCAUC | PRAUC |
-     |----+---------+--------+---------------------+----------+--------+-----------+------+-------+--------+-------|
-     | 1  |     10% |    100 |                9252 |     0.96 |   0.20 |      0.18 | 0.19 | 0.195 |  0.904 | 0.174 |
-     | 1a |     25% |    100 |               42407 |     0.97 |   0.27 |      0.32 | 0.29 | 0.278 |  0.952 | 0.295 |
-     | 1b |     50% |    100 |              193898 |          |        |           |      |       |        |       |
+     | id |  variant | epochs | #samples (training) | accuracy | recall | precision |   F1 |    F2 | ROCAUC | PRAUC |
+     |----+----------+--------+---------------------+----------+--------+-----------+------+-------+--------+-------|
+     | 1  |      10% |    100 |                9252 |     0.96 |   0.20 |      0.18 | 0.19 | 0.195 |  0.904 | 0.174 |
+     | 1a |      25% |    100 |               42407 |     0.97 |   0.27 |      0.32 | 0.29 | 0.278 |  0.952 | 0.295 |
+     | 1b |      50% |    100 |              193898 |     0.97 |   0.34 |      0.30 | 0.32 |  0.33 |   0.95 | 0.283 |
+     | 2  | 50%-diff |     10 |              193898 |     0.94 |   0.72 |      0.25 | 0.37 | 0.521 |  0.951 | 0.394 |
+     | 2a | 75%-diff |     10 |              407162 |     0.94 |   0.72 |      0.23 | 0.35 | 0.503 |  0.954 | 0.387 |
 
 
 
@@ -115,14 +117,24 @@
     [goodfellow2016deep] suggests that it is the single most important
     hyper parameter.
 
-    Experiments were first carried out with the 10% dataset variant
-    (since training is quicker) and the /lr/ of the best model was
-    applied to the 50% dataset variant to obtain the final model of
-    the category. See =notebooks/pm/exp-optim.ipynb= for more details.
+    The 50%-diff dataset variant was used (since it produced the best
+    results in the previous class of experiment, see [[*Experiments with dataset][Experiments with
+    dataset]]), all parameters were kept constant whilst /lr/ being
+    varied to obtain the final model of the category. See
+    =notebooks/pm/exp-optim.ipynb= for more details.
 
     The different optimizers along with their best results are
     summarized below:
     1. SGD: =lr\=0.001=
+
+       
+
+**** Summary of results
+| id   | variant  |     lr | accuracy | recall | precision |   F1 |    F2 | ROCAUC | PRAUC |
+|------+----------+--------+----------+--------+-----------+------+-------+--------+-------|
+| base | 50-diff% |  0.001 |     0.94 |   0.72 |      0.25 | 0.37 | 0.521 |  0.951 | 0.394 |
+| 1    | 50-diff% | 0.0001 |     0.93 |   0.76 |      0.22 | 0.34 |  0.51 |  0.945 | 0.359 |
+| 1a   | 50-diff  |   0.01 |          |        |           |      |       |        |       |
 
 ** Evaluation
    The /main/ dataset is highly skewed, with the *majority* class
@@ -163,6 +175,24 @@
      and evaluation techniques for models dealing with highly skewed data
    - [2020-08-21 Fri 11:26] [[https://machinelearningmastery.com/tour-of-evaluation-metrics-for-imbalanced-classification/][article]] provides a useful flow chart for
      selecting a model evaluation metric when dealing with inbalanced classes
+
+* Graph Community Detection
+  This section describes the stratergies explored to replce the /Graph
+  Community Detection/ step for the existing data processing pipeline.
+
+** Approach
+   The output of the /Pattern Matrix/ model is a one dimensional
+   vector consisting binary values {0, 1}. However, it can be "folded"
+   back into a (n, n) adjacency matrix (where n is the number of
+   samples).
+
+   The adjacency matrix can be converted into a graph which serves as
+   the training data for the model.
+   
+   Graph Convolutional Neural Networks (GconvNN) are used to train on
+   graphs created using the output of the /Pattern Matrix/ model. The
+   idea being, existance of connected nodes indicate that the
+   timeslice contains hits from neutrino events.
 
 * References
 + [goodfellow2016deep] :: Goodfellow, I., Bengio, Y., Courville, A., &
