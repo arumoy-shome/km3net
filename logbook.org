@@ -27,9 +27,143 @@
        the same "event" ie. they have the same =event_id=.
 
 ** Creation of "Pattern Matrix" Dataset
-** Experiments
-   This section tracks all experiments which were conducted in order
-   to obtain the final model to replace the _pattern matrix_ algorithm
-   of the existing data processing pipueline.
-*** TODO Experiment 2.
+   A sample of the /main/ dataset, namely all data from the /timeslice
+   615/ was choosen as input to the "pattern matrix" dataset creation
+   algorithm. Once generated, further random samples of varying sizes
+   were considered in order to determine the optimal training data
+   size. See [[*Experiments][Experiments]] for details.
 
+   The rationale for considering only timeslice 615 being two fold:
+   1. It is the timeslice which contains the most number of hits from
+      neutrino events
+   2. and the fact that the model only needs to learn how to identify
+      "related" and "unrelated" hits, simply done by looking at the
+      difference of two points. This ofcourse is consistent across
+      timeslices thus free of any bias.
+   
+** Experiments
+   This section provides a summary of all experiments (and their
+   results) which were conducted in order to obtain the final model to
+   replace the /pattern matrix/ algorithm of the existing data
+   processing pipeline. Details of each experiment can be found in
+   =notebooks/pattern-matrix.ipynb=.
+
+   The final results obtained from each category of experiments are
+   summarized below. For further details, the corresponding section
+   for the experiment categories follow.
+
+   1. [[*Experiments with dataset][Experiments with dataset]]: 50% random sample with equal number of
+      samples for each class produced the best result.
+   2. [[*Experiments with optimizers][Experiments with optimizers]] 
+      
+*** Notes on selection of epochs
+    The number of epochs is varied per experiment. This is
+    because, this parameter is largely determined by the dataset
+    itself, and the learning rate of the optimizer.
+
+    In general, the number of epochs reported in each experiment was
+    identified by first observing the learning curve and selecting an
+    ideal value such that the loss was either reasonably minimized or
+    the validation loss did not deteriorate.
+*** Experiments with dataset
+    In these experiments, variants of the data namely it's shape and
+    size were manipulated whilst keeping other parameters same. Two
+    shape variants were considered:
+    1. *original pattern matrix* dataset of shape (n, 9)
+    2. and *diff pattern matrix* dataset of shape (n, 5) where the
+       difference between the (x,y,z,time) features of the points
+       were taken
+
+    Since the dataset is highly skewed, the majority class was
+    undersampled for each size variant, which are as follows:
+    1. *10%* random sample of slice 615
+    2. *25%* random sample of slice 615
+    3. *50%* random sample of slice 615
+    4. *75%* random sample of slice 615
+
+    Overall, diminishing rewards were observed as the size of the
+    dataset increased with the *50%-diff* variant producing the best
+    results.
+**** Summary of results
+     The following parameters were constant across all experiments:
+
+     | parameter           | value                                  |
+     |---------------------+----------------------------------------|
+     | loss                | BCELoss                                |
+     | optimizer           | SGD with =lr\=0.001= & =momentum\=0.9= |
+     | model architecture  | (inputs, 10) -> (10,8) -> (8, 1)       |
+     | activation (hidden) | ReLu                                   |
+     | activation (output) | Sigmoid                                |
+     | #samples (testing)  | 364231                                 |
+
+
+     Following table summarizes the various evaluation metrics observed
+     over varying dataset sizes. See [[*Evaluation][Evaluation]] for details on metrics
+     used.
+
+     | id | variant | epochs | #samples (training) | accuracy | recall | precision |   F1 |    F2 | ROCAUC | PRAUC |
+     |----+---------+--------+---------------------+----------+--------+-----------+------+-------+--------+-------|
+     | 1  |     10% |    100 |                9252 |     0.96 |   0.20 |      0.18 | 0.19 | 0.195 |  0.904 | 0.174 |
+     | 1a |     25% |    100 |               42407 |     0.97 |   0.27 |      0.32 | 0.29 | 0.278 |  0.952 | 0.295 |
+     | 1b |     50% |    100 |              193898 |          |        |           |      |       |        |       |
+
+
+
+*** Experiments with optimizers
+    In this class of experiments, different optimizers were used and
+    their /learning rate/ parameter was varied. This is because
+    [goodfellow2016deep] suggests that it is the single most important
+    hyper parameter.
+
+    Experiments were first carried out with the 10% dataset variant
+    (since training is quicker) and the /lr/ of the best model was
+    applied to the 50% dataset variant to obtain the final model of
+    the category. See =notebooks/pm/exp-optim.ipynb= for more details.
+
+    The different optimizers along with their best results are
+    summarized below:
+    1. SGD: =lr\=0.001=
+
+** Evaluation
+   The /main/ dataset is highly skewed, with the *majority* class
+   being hits from background noise and the *minority* class being
+   hits from neutrino events. Thus, the /pattern matrix/ dataset is
+   also skewed with the *minority* class being related hits and
+   *majority* class being unrelated hits.
+
+   While the training dataset contains equal number of samples for
+   each class, the testing dataset maintains it's skewed distribution
+   since this represents realistic data which the model will be
+   required to classify.
+
+   Accuracy is not an ideal metric to use for evaluating the model,
+   thus the following alternatives are used:
+   1. Recall: this should be high indicating the model is able to
+      identify the minority class
+   2. Precision: should ideally be high indicating the model does not
+      misclassify unrelated hits as related hits, although this is not
+      a priority (saving a timeslice with no event hits has less
+      weight compared to *not* saving a timeslice containing event hits)
+   3. F1 score: should be high, however we care more about the recall
+   4. F2 score: since we care more about the recall, we give it more
+      weight while calculating the F-beta score
+   5. ROC AUC: although this can be misleading since the ROC considers
+      both classes and can be over optimistic (due to the skewedness
+      of data)
+   6. Precision-Recall (PR) AUC: a better alternative to the ROC AUC
+      since it focuses on the minority class
+
+   Additionally the ROC curve and the PR curves are also visually
+   inspected.
+
+   Relevant sources:
+   - [2020-08-20 Thu 21:56] [[https://machinelearningmastery.com/tour-of-evaluation-metrics-for-imbalanced-classification/][article]] explaining performance metrics for
+   imbalanced data
+   - [2020-08-21 Fri 11:13] [[https://arxiv.org/pdf/1505.01658.pdf][paper]] presenting an overview of stratergies
+     and evaluation techniques for models dealing with highly skewed data
+   - [2020-08-21 Fri 11:26] [[https://machinelearningmastery.com/tour-of-evaluation-metrics-for-imbalanced-classification/][article]] provides a useful flow chart for
+     selecting a model evaluation metric when dealing with inbalanced classes
+
+* References
++ [goodfellow2016deep] :: Goodfellow, I., Bengio, Y., Courville, A., &
+  Bengio, Y. (2016). Deep learning (Vol. 1). Cambridge: MIT press.
