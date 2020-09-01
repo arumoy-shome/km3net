@@ -2,6 +2,26 @@
 #+AUTHOR: Arumoy Shome
 #+DATE: August 20, 2020
 
+* Inbox
+  - [2020-08-21 Fri 13:47] [[https://arxiv.org/abs/1206.5533][paper]] on practical recommendations for common
+  hyper parameters for gradient descent based models
+** Evaluation metrics for skewed datasets
+   + accuracy/error can be missleading if the dataset is skewed
+     (common sense, if you are testing with a dataset where only 1% is
+     the minority, then 99% accuracy can be obtained by simply
+     predicting the majority class label)
+   + better to look at precision-recall-f1 for skewed datasets (uses
+     the confusion matrix)
+   + ROC curve can be optimistic when used for a skewed dataset (since
+     it looks at both precision and recall), better to use
+     precision-recall curve (since it only considers the minority
+     class)
+   + precision-recall are inversely proportional, increasing recall
+     often results in lower precision
+   + when minimizing false negatives is more important, favour recall
+     (use f2 score). Conversely, when minimizing false positives is
+     more important, favour precision (use f0.5 score)
+
 * Pattern Matrix
   In this section strategies are explored to replace the /Hit
   Correlation/ step of the existing data processing pipeline.
