@@ -61,7 +61,50 @@
       difference of two points. This ofcourse is consistent across
       timeslices thus free of any bias.
    
-** Experiments
+** Evaluation
+   The /main/ dataset is highly skewed, with the *majority* class
+   being hits from background noise and the *minority* class being
+   hits from neutrino events. Thus, the /pattern matrix/ dataset is
+   also skewed with the *minority* class being related hits and
+   *majority* class being unrelated hits.
+
+   While the training dataset contains equal number of samples for
+   each class, the testing dataset maintains it's skewed distribution
+   since this represents realistic data which the model will be
+   required to classify.
+
+   Accuracy is not an ideal metric to use for evaluating the model,
+   thus the following alternatives are used:
+   1. Recall: this should be high indicating the model is able to
+      identify the minority class
+   2. Precision: should ideally be high indicating the model does not
+      misclassify unrelated hits as related hits, although this is not
+      a priority (saving a timeslice with no event hits has less
+      weight compared to *not* saving a timeslice containing event hits)
+   3. F1 score: should be high, however we care more about the recall
+   4. F2 score: since we care more about the recall, we give it more
+      weight while calculating the F-beta score
+   5. ROC AUC: although this can be misleading since the ROC considers
+      both classes and can be over optimistic (due to the skewedness
+      of data)
+   6. Precision-Recall (PR) AUC: a better alternative to the ROC AUC
+      since it focuses on the minority class
+
+   Additionally the ROC curve and the PR curves are also visually
+   inspected.
+
+   Relevant sources:
+   - [2020-08-20 Thu 21:56] [[https://machinelearningmastery.com/tour-of-evaluation-metrics-for-imbalanced-classification/][article]] explaining performance metrics for
+   imbalanced data
+   - [2020-08-21 Fri 11:13] [[https://arxiv.org/pdf/1505.01658.pdf][paper]] presenting an overview of stratergies
+     and evaluation techniques for models dealing with highly skewed data
+   - [2020-08-21 Fri 11:26] [[https://machinelearningmastery.com/tour-of-evaluation-metrics-for-imbalanced-classification/][article]] provides a useful flow chart for
+     selecting a model evaluation metric when dealing with inbalanced classes
+
+** DONE Experiments
+   :LOGBOOK:
+   - State "DONE"       from              [2020-09-04 Fri 14:39]
+   :END:
    This section provides a summary of all experiments (and their
    results) which were conducted in order to obtain the final model to
    replace the /pattern matrix/ algorithm of the existing data
@@ -85,7 +128,10 @@
     identified by first observing the learning curve and selecting an
     ideal value such that the loss was either reasonably minimized or
     the validation loss did not deteriorate.
-*** Experiments with dataset
+*** DONE Experiments with dataset
+    :LOGBOOK:
+    - State "DONE"       from              [2020-09-04 Fri 12:21]
+    :END:
     In these experiments, variants of the data namely it's shape and
     size were manipulated whilst keeping other parameters same. Two
     shape variants were considered:
@@ -129,9 +175,10 @@
      | 2  | 50%-diff |     10 |              193898 |     0.94 |   0.72 |      0.25 | 0.37 | 0.521 |  0.951 | 0.394 |
      | 2a | 75%-diff |     10 |              407162 |     0.94 |   0.72 |      0.23 | 0.35 | 0.503 |  0.954 | 0.387 |
 
-
-
-*** Experiments with optimizers
+*** DONE Experiments with optimizers
+    :LOGBOOK:
+    - State "DONE"       from              [2020-09-04 Fri 12:21]
+    :END:
     In this class of experiments, different optimizers were used and
     their /learning rate/ parameter was varied. This is because
     [goodfellow2016deep] suggests that it is the single most important
@@ -147,8 +194,8 @@
     summarized below:
     1. SGD: =lr\=0.001=
 
+    Overall no improvements were noticed.
        
-
 **** Summary of results
 | id   | variant  |     lr | accuracy | recall | precision |   F1 |    F2 | ROCAUC | PRAUC |
 |------+----------+--------+----------+--------+-----------+------+-------+--------+-------|
@@ -156,45 +203,29 @@
 | 1    | 50-diff% | 0.0001 |     0.93 |   0.76 |      0.22 | 0.34 |  0.51 |  0.945 | 0.359 |
 | 1a   | 50-diff  |   0.01 |          |        |           |      |       |        |       |
 
-** Evaluation
-   The /main/ dataset is highly skewed, with the *majority* class
-   being hits from background noise and the *minority* class being
-   hits from neutrino events. Thus, the /pattern matrix/ dataset is
-   also skewed with the *minority* class being related hits and
-   *majority* class being unrelated hits.
+*** DONE Experiments with model architecture
+    :LOGBOOK:
+    - State "DONE"       from "TODO"       [2020-09-04 Fri 14:35]
+    :END:
+    In this class of experiments the length and breadth of the model
+    are varied. Multiples of 2 were used to determine the choose the
+    number of neurons, the minimum being 8 (ie. layer hidden layer
+    always has a shape of =(8, 1)=).
 
-   While the training dataset contains equal number of samples for
-   each class, the testing dataset maintains it's skewed distribution
-   since this represents realistic data which the model will be
-   required to classify.
+    The best results were obtained by setting the model architecture
+    as =(inputs, 16) -> (16, 8) -> (8,1)= with a recall of 0.81. The
+    results were deemed good enough for this model and thus
+    experiments for the PM model were concluded.
 
-   Accuracy is not an ideal metric to use for evaluating the model,
-   thus the following alternatives are used:
-   1. Recall: this should be high indicating the model is able to
-      identify the minority class
-   2. Precision: should ideally be high indicating the model does not
-      misclassify unrelated hits as related hits, although this is not
-      a priority (saving a timeslice with no event hits has less
-      weight compared to *not* saving a timeslice containing event hits)
-   3. F1 score: should be high, however we care more about the recall
-   4. F2 score: since we care more about the recall, we give it more
-      weight while calculating the F-beta score
-   5. ROC AUC: although this can be misleading since the ROC considers
-      both classes and can be over optimistic (due to the skewedness
-      of data)
-   6. Precision-Recall (PR) AUC: a better alternative to the ROC AUC
-      since it focuses on the minority class
+**** Summary of results
+     The parameters which gave the best results from the [[*Experiments with dataset][Experiments
+     with dataset]] class of experiments were chosen whilst varying the
+     length and depth of the model.
 
-   Additionally the ROC curve and the PR curves are also visually
-   inspected.
-
-   Relevant sources:
-   - [2020-08-20 Thu 21:56] [[https://machinelearningmastery.com/tour-of-evaluation-metrics-for-imbalanced-classification/][article]] explaining performance metrics for
-   imbalanced data
-   - [2020-08-21 Fri 11:13] [[https://arxiv.org/pdf/1505.01658.pdf][paper]] presenting an overview of stratergies
-     and evaluation techniques for models dealing with highly skewed data
-   - [2020-08-21 Fri 11:26] [[https://machinelearningmastery.com/tour-of-evaluation-metrics-for-imbalanced-classification/][article]] provides a useful flow chart for
-     selecting a model evaluation metric when dealing with inbalanced classes
+     | id | arch           | epochs | accuracy | recall | precision |    F1 |    F2 | ROCAUC | PRAUC |
+     |----+----------------+--------+----------+--------+-----------+-------+-------+--------+-------|
+     |  1 | 16,8           |     10 |     0.93 |   0.78 |      0.21 | 0.334 | 0.508 |  0.955 | 0.377 |
+     | 1b | 32,8           |      5 |     0.92 |   0.81 |      0.19 | 0.312 | 0.494 |  0.958 | 0.431 |
 
 * Graph Community Detection
   This section describes the stratergies explored to replce the /Graph
