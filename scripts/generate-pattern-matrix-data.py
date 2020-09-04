@@ -1,6 +1,6 @@
 from context import km3net
 from km3net.utils import DATADIR
-import km3net.data.pattern_matrix as pm
+import km3net.data.pm as pm
 import pandas as pd
 import sys
 import os
@@ -10,8 +10,7 @@ if __name__ == "__main__":
     path = DATADIR + input('source data file: ')
     name = DATADIR + input('name of final data file: ')
     equalise = input("equalise targets? [y/n]: ")
-    if equalize.lower() == 'y':
-        frac = float(input('frac: '))
+    frac = float(input('frac: '))
     save = input("save to disk? [y/n]: ")
 
     while not os.path.isfile(path):
