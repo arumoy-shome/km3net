@@ -4,10 +4,10 @@ from torch.nn.init import kaiming_uniform_, xavier_uniform_
 class MLP(Module):
     def __init__(self, n_inputs):
         super(MLP, self).__init__()
-        self.hidden1 = Linear(n_inputs, 10)
+        self.hidden1 = Linear(n_inputs, 32)
         kaiming_uniform_(self.hidden1.weight, nonlinearity='relu')
         self.act1 = ReLU()
-        self.hidden2 = Linear(10, 8)
+        self.hidden2 = Linear(32, 8)
         kaiming_uniform_(self.hidden2.weight, nonlinearity='relu')
         self.act2 = ReLU()
         self.hidden3 = Linear(8, 1)
