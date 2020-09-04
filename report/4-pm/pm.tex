@@ -1,0 +1,167 @@
+% this file is called up by thesis.tex
+% content in this file will be fed into the main document
+
+\chapter{Hit Correlation} % top level followed by section, subsection
+
+% ----------------------- paths to graphics ------------------------
+
+\graphicspath{{./4-pm/figures/}}
+
+% ----------------------- contents from here ------------------------
+% 
+This chapter presents the replacement created using a Multi Layered
+Perceptron (MLP) for the \textit{Hit Correlation Step} of the pipeline
+proposed by \cite{karas2019data} (herein referred to as \textit{The
+  Karas Pipeline}). A brief description of the Karas pipeline follows.
+
+% TODO the explanation of the pattern matrix criterion is not clear
+The first step of The Karas pipeline is the Hit Correlation step. In
+this step, pairs of hits (from events and noise) are considered and
+the correlation along two axes namely space and time are considered.
+Karas proposes \textit{The Pattern Matrix Criterion}, a novel event
+trigger algorithm by creating a correlation criterion based on the
+probability that a given space and time difference occurs between two
+event hits. From domain knowledge, the evaluation is limited to 100m
+and 300ns for space and time differences respectively. The algorithm
+is evaluated with a dataset containing 130 event hits and 5000 noise
+hits and scores in the range of 0.3 - 0.375 is reported for the
+recall, precision and F1 metrics.
+
+\section{Pattern Matrix Replacement}
+An alternative to the Pattern Matrix Criterion is created using a
+Multi-Layered Perceptron (MLP) which given a pair of points can
+classify them as causally related or unrelated. The training of such a
+neural network, requires two additional sub tasks summarized below and
+elaborated upon in Section \ref{sec:create-pattern-matrix}.
+
+\begin{enumerate}
+\item \textbf{Preparation of dataset}: Given the main dataset, a new
+  dataset (henceforth referred to as the \textit{pattern matrix}
+  dataset) is created such that each row contains the \texttt{x, y, z
+    and time} features for all unique pairs of points.
+\item \textbf{Creation of labels}: Using the \textit{mc\_info} table,
+  labels are created for the dataset. Hits originating from the same
+  event (ie. with the same \texttt{event\_id}) are given a label of 1
+  whilst all other pairs are given a label of 0.
+\end{enumerate}
+
+\section{Creation of the Pattern Matrix Dataset}\label{sec:create-pattern-matrix}
+A sample of the main dataset, ie. all data from the timeslice group
+615 were chosen for the creation of the pattern matrix dataset since
+this timeslice contained the highest number of event hits compared to
+other timeslice. This is useful since the dataset is highly skewed and
+using a timeslice with lesser number of event hits will proliferate
+the skewed nature of the data in the pattern matrix dataset once
+created. The model is required to classify related and unrelated hits
+which can be done by observing the space and time difference between
+the given points. Since this phenomenon is consistent across the
+entire dataset, training using the timeslice 615 subsample does not
+introduce any bias into the model.
+
+% TODO find the mathematical term for the series
+Figure \ref{fig:pm-dataset} summarizes the pattern matrix dataset
+creation process. With an input data of shape \texttt{(n, 4)}
+(\texttt{n} rows and 4 columns representing the \texttt{x, y, z, and
+  time}), an output data of shape \texttt{($\sum_{k=n-1}^{1}k$, 9)} is
+obtained. We note that there is a XYZ rise in the number of rows since
+each row (representing a single hit) is paired with the remaining
+unique rows. The output dataset consists of 9 columns due to the
+presence of \texttt{x, y, z and time} columns of two hits plus the
+label column.
+
+\section{Model Description}
+The expectation of the model is to identify if two given points are
+causally related to each other or not. As revealed through data
+exploration in Chapter \ref{cha:data-prep}, hits originating from
+neutrino events occur close to each other in space and time. Thus, The
+expectation from the model is to learn this phenomenon by training
+over pairs of points and classify unseen data as related or unrelated.
+
+Since this is a binary classification task, the \textit{Binary Cross
+  Entropy Loss (BCELoss)} was selected as the loss function since it
+has been established as the standard loss function for binary
+classification tasks \cite{CITEME}. As the BCELoss function expects an
+input in the range of $[0, 1]$, the \textit{Sigmoid} activation
+function was chosen for the output layer. The \textit{ReLu} activation
+was chosen for the hidden layers due to its XYZ properties as
+supported by many literate \cite{CITME}. The model architecture
+consists of an input layer, two hidden layers and an output layer.
+Figure \ref{fig:mlp-overview} summarizes the model parameters and
+architecture.
+
+\section{Model Training}
+Several experiments were conducted in order to obtain the final model
+to replace the \textit{pattern matrix} algorithm of The Karas
+pipeline.
+
+Experiments were carried out in two alternative paths and their
+findings were ultimately combined to obtain the best model. The final
+results obtained from each category of experiments are summarized
+below. For further details, the corresponding section for the
+experiment categories follow.
+
+\begin{enumerate}
+\item \textbf{Experiments with dataset}: 50\% random sample with equal
+  number of samples for each class produced the best result.
+\item \textbf{Experiment with optimizers}: \textit{Adam optimizer} with a
+  \textit{learning rate} of $0.001$ produced the best result.
+\end{enumerate}
+
+\subsection{Experiments with Dataset}
+In these experiments, variants of the data shape (ie. its length and
+breadth) were manipulated. Two breadth variants were considered, 1.
+the \textbf{Original Pattern Matrix} dataset of shape \texttt{(n, 9)}
+and 2. the \textbf{Delta pattern Matrix} dataset of shape \texttt{(n,
+  5)} where the difference in space and time of the points were taken.
+
+Since the dataset is highly skewed, the majority class was
+\textit{under sampled} for each breadth variant and four length
+variants were considered, 1. \textbf{10\%} 2. \textbf{25\%} 3.
+\textbf{50\%} and 4. \textbf{75\%} random sample of the dataset.
+Overall, diminishing rewards were observed as the length of the
+dataset was increased. The \textbf{50\%} random sample of the
+\textbf{Delta pattern matrix} produced the best results.
+
+\subsection{Experiments with Optimizers}
+The \textit{Stochastic Gradient Descent (SGD)} and the \textit{Adam}
+optimizers were considered and several experiments with conducted by
+varying the \textit{learning rate} parameter. The \textbf{50\% delta
+  pattern matrix} dataset was used for these produced the best results
+in the previous class of experiments.
+
+%% TODO: write conclusion for this class of experiments (once done)
+
+\section{Model Evaluation}
+The main dataset is highly skewed, with the \textbf{majority class}
+being hits from background noise and the \textbf{minority class} being
+hits from neutrino events. Thus, the \textit{pattern matrix} dataset
+is also skewed with the minority class class being related hits and
+majority class being unrelated hits. In binary classification, the
+majority class is also referred to as the \textbf{negative class}
+(since it usually has a label of 0) and the minority class is referred
+to as the \textbf{positive class} (since usually has a label of 1).
+Henceforth this alternative naming convention is used in this report.
+
+While the training dataset contains equal number of samples for each
+class, the testing data maintains its skewed distribution since this
+represents realistic data which the model will require to classify.
+
+For highly skewed data, accuracy is not a good metric for evaluating
+the model performance \cite{branco2015survey} thus the following
+alternatives are considered:
+
+\begin{enumerate}
+\item \textbf{Recall} is the ability of the model to correctly
+  identify the minority class. For this problem, the recall of the
+  model is given higher presidency over its precision. This is because
+  the model should be able to identify all instances of the positive
+  class since this determines if the timeslice will ultimately be
+  saved or not.
+\item \textbf{Precision} is the ability of the model to not
+  misclassify an instance of the negative class (ie. classify it as
+  the positive class). Although this should also be high, it is often
+  inversely proportional to recall.
+\end{enumerate}
+% ---------------------------------------------------------------------------
+% ----------------------- end of thesis sub-document ------------------------
+% ---------------------------------------------------------------------------
