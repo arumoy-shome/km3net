@@ -216,23 +216,37 @@
      #+end_example
 
 * Graph Community Detection
-  This section describes the stratergies explored to replce the /Graph
+  This section describes the strategies explored to replace the /Graph
   Community Detection/ step for the existing data processing pipeline.
 
+** Primer on Graph Neural Networks
+   It is important to understand the different applications of Graph
+   Neural Networks (GNNs) before we proceed. GNNs have two primary
+   applications:
+   1. *Node classification* which is a semi-supervised learning
+      setting. The idea is that given a graph with partial labels, we
+      want to conduct label propagation.
+   2. *Graph classification* which is a supervised learning setting.
+      Here we have several graphs with a corresponding label and we
+      want to classify them.
+
+   In this project we use graph classification.
+
 ** Approach
-   The output of the /Pattern Matrix/ model is a one dimensional
-   vector consisting binary values {0, 1}. However, it can be "folded"
-   back into a (n, n) adjacency matrix (where n is the number of
-   samples).
-
-   The adjacency matrix can be converted into a graph which serves as
-   the training data for the model.
+   Let's say we have data for timeslices in the form of =(n, 5)=
+   dataframe (5 features because =x, y, z, t and label=).
    
-   Graph Convolutional Neural Networks (GconvNN) are used to train on
-   graphs created using the output of the /Pattern Matrix/ model. The
-   idea being, existance of connected nodes indicate that the
-   timeslice contains hits from neutrino events.
+   Each timeslice is a graph where each hit (row of dataframe) is
+   represented by a node and all nodes are connected by undirected
+   edges. It's label can be obtained by looking at the number of event
+   hits present and setting it to 1 if the count is above a certain
+   threshold. Each node of the graph has an embedding/feature vector
+   corresponding to the =(4,)= feature vector (row of the dataframe).
 
+   Two approaches are considered:
+   1. Train a model with no edge information
+   2. Train a model with additional edge information from the PM model
+      
 * References
 + [goodfellow2016deep] :: Goodfellow, I., Bengio, Y., Courville, A., &
   Bengio, Y. (2016). Deep learning (Vol. 1). Cambridge: MIT press.
