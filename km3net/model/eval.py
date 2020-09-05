@@ -141,6 +141,9 @@ def evaluate(y_true, y_pred, y_score, train_losses, valid_losses, model):
     fig = confusion_matrix(matrix, classes=[0, 1], normalize=True)
     fig.show()
 
+    fig = confusion_matrix(matrix, classes=[0, 1])
+    fig.show()
+
     # roc curve
     roc_auc, fig = roc_curve(y_true, y_score)
     fig.show()
