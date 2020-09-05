@@ -1,6 +1,6 @@
 from context import km3net
 from km3net.utils import DATADIR
-import km3net.data.pattern_matrix as pm
+import km3net.data.pm as pm
 import pandas as pd
 import sys
 import os
