@@ -5,22 +5,6 @@
 * Inbox
   - [2020-08-21 Fri 13:47] [[https://arxiv.org/abs/1206.5533][paper]] on practical recommendations for common
   hyper parameters for gradient descent based models
-** Evaluation metrics for skewed datasets
-   + accuracy/error can be missleading if the dataset is skewed
-     (common sense, if you are testing with a dataset where only 1% is
-     the minority, then 99% accuracy can be obtained by simply
-     predicting the majority class label)
-   + better to look at precision-recall-f1 for skewed datasets (uses
-     the confusion matrix)
-   + ROC curve can be optimistic when used for a skewed dataset (since
-     it looks at both precision and recall), better to use
-     precision-recall curve (since it only considers the minority
-     class)
-   + precision-recall are inversely proportional, increasing recall
-     often results in lower precision
-   + when minimizing false negatives is more important, favour recall
-     (use f2 score). Conversely, when minimizing false positives is
-     more important, favour precision (use f0.5 score)
 
 * Pattern Matrix
   In this section strategies are explored to replace the /Hit
@@ -47,11 +31,15 @@
        the same "event" ie. they have the same =event_id=.
 
 ** Creation of "Pattern Matrix" Dataset
-   A sample of the /main/ dataset, namely all data from the /timeslice
-   615/ was choosen as input to the "pattern matrix" dataset creation
-   algorithm. Once generated, further random samples of varying sizes
-   were considered in order to determine the optimal training data
-   size. See [[*Experiments][Experiments]] for details.
+   A sample of the /main/ dataset was choosen as input to the "pattern
+   matrix" dataset creation algorithm. Once generated, further random
+   samples of varying sizes were considered in order to determine the
+   optimal training data size. See [[*Experiments][Experiments]] for details.
+
+   Two sampling variants were explored:
+   1. random samples from timeslice 615 only
+   2. random samples from mixed timeslices: specifically top 5
+      timeslices with the most number of event hits
 
    The rationale for considering only timeslice 615 being two fold:
    1. It is the timeslice which contains the most number of hits from
@@ -64,7 +52,7 @@
 ** Evaluation
    The /main/ dataset is highly skewed, with the *majority* class
    being hits from background noise and the *minority* class being
-   hits from neutrino events. Thus, the /pattern matrix/ dataset is
+   Hits from neutrino events. Thus, the /pattern matrix/ dataset is
    also skewed with the *minority* class being related hits and
    *majority* class being unrelated hits.
 
@@ -101,6 +89,13 @@
    - [2020-08-21 Fri 11:26] [[https://machinelearningmastery.com/tour-of-evaluation-metrics-for-imbalanced-classification/][article]] provides a useful flow chart for
      selecting a model evaluation metric when dealing with inbalanced classes
 
+*** Testing datasets
+    The following variants were picked to test the model:
+    1. no related hits (slice 0): no related hits
+    2. low related hits (slice 3650): less than 25 related hits
+    3. medium related hits (slice 1800): less than 500 related hits
+    4. high related hits (slice 1637): less than 1500 related hits
+
 ** DONE Experiments
    :LOGBOOK:
    - State "DONE"       from              [2020-09-04 Fri 14:39]
@@ -108,17 +103,22 @@
    This section provides a summary of all experiments (and their
    results) which were conducted in order to obtain the final model to
    replace the /pattern matrix/ algorithm of the existing data
-   processing pipeline. Details of each experiment can be found in
-   =notebooks/pattern-matrix.ipynb=.
+   processing pipeline. Details of each experiment can be found in the
+   corresponding notebooks in the =notebooks/pm/= directory.
 
    The final results obtained from each category of experiments are
    summarized below. For further details, the corresponding section
    for the experiment categories follow.
 
-   1. [[*Experiments with dataset][Experiments with dataset]]: 50% random sample with equal number of
-      samples for each class produced the best result.
-   2. [[*Experiments with optimizers][Experiments with optimizers]] 
-      
+   1. [[*Experiments with dataset][Experiments with dataset]]: 10% random sample from mixed
+      timeslices with equal number of samples for each class produced
+      the best result.
+   2. [[*Experiments with optimizers][Experiments with optimizers]]: No difference was noticed between
+      SGD and Adam, =lr\=0.001= produced the best results across
+      optimizers.
+   3. [[*Experiments with model architecture][Experiments with model architecture]]: two hidden layers with 16
+      and 8 neurons respectively produced the best results.
+
 *** Notes on selection of epochs
     The number of epochs is varied per experiment. This is
     because, this parameter is largely determined by the dataset
@@ -146,10 +146,11 @@
     2. *25%* random sample of slice 615
     3. *50%* random sample of slice 615
     4. *75%* random sample of slice 615
+    5. *10%* random sample of slice mixed
 
     Overall, diminishing rewards were observed as the size of the
-    dataset increased with the *50%-diff* variant producing the best
-    results.
+    dataset increased with the *mixed-10-equal-diff* variant producing the
+    best results.
 **** Summary of results
      The following parameters were constant across all experiments:
 
@@ -162,18 +163,9 @@
      | activation (output) | Sigmoid                                |
      | #samples (testing)  | 364231                                 |
 
-
-     Following table summarizes the various evaluation metrics observed
-     over varying dataset sizes. See [[*Evaluation][Evaluation]] for details on metrics
-     used.
-
-     | id |  variant | epochs | #samples (training) | accuracy | recall | precision |   F1 |    F2 | ROCAUC | PRAUC |
-     |----+----------+--------+---------------------+----------+--------+-----------+------+-------+--------+-------|
-     | 1  |      10% |    100 |                9252 |     0.96 |   0.20 |      0.18 | 0.19 | 0.195 |  0.904 | 0.174 |
-     | 1a |      25% |    100 |               42407 |     0.97 |   0.27 |      0.32 | 0.29 | 0.278 |  0.952 | 0.295 |
-     | 1b |      50% |    100 |              193898 |     0.97 |   0.34 |      0.30 | 0.32 |  0.33 |   0.95 | 0.283 |
-     | 2  | 50%-diff |     10 |              193898 |     0.94 |   0.72 |      0.25 | 0.37 | 0.521 |  0.951 | 0.394 |
-     | 2a | 75%-diff |     10 |              407162 |     0.94 |   0.72 |      0.23 | 0.35 | 0.503 |  0.954 | 0.387 |
+     #+begin_example
+     The slice-mixed-10-equal-diff dataset produced the best results.
+     #+end_example
 
 *** DONE Experiments with optimizers
     :LOGBOOK:
@@ -197,54 +189,64 @@
     Overall no improvements were noticed.
        
 **** Summary of results
-| id   | variant  |     lr | accuracy | recall | precision |   F1 |    F2 | ROCAUC | PRAUC |
-|------+----------+--------+----------+--------+-----------+------+-------+--------+-------|
-| base | 50-diff% |  0.001 |     0.94 |   0.72 |      0.25 | 0.37 | 0.521 |  0.951 | 0.394 |
-| 1    | 50-diff% | 0.0001 |     0.93 |   0.76 |      0.22 | 0.34 |  0.51 |  0.945 | 0.359 |
-| 1a   | 50-diff  |   0.01 |          |        |           |      |       |        |       |
+     #+begin_example
+     No discernable difference were noticed between SGD and Adam.
+     Learning rate of 0.001 gave the best results for both optimizers.
+     #+end_example
 
 *** DONE Experiments with model architecture
     :LOGBOOK:
     - State "DONE"       from "TODO"       [2020-09-04 Fri 14:35]
     :END:
     In this class of experiments the length and breadth of the model
-    are varied. Multiples of 2 were used to determine the choose the
-    number of neurons, the minimum being 8 (ie. layer hidden layer
-    always has a shape of =(8, 1)=).
-
-    The best results were obtained by setting the model architecture
-    as =(inputs, 16) -> (16, 8) -> (8,1)= with a recall of 0.81. The
-    results were deemed good enough for this model and thus
-    experiments for the PM model were concluded.
+    are varied. Multiples of 2 were used to determine the number of
+    neurons, the minimum being 8 (ie. hidden layer always has a shape
+    of =(8, 1)=).
 
 **** Summary of results
      The parameters which gave the best results from the [[*Experiments with dataset][Experiments
      with dataset]] class of experiments were chosen whilst varying the
      length and depth of the model.
 
-     | id | arch           | epochs | accuracy | recall | precision |    F1 |    F2 | ROCAUC | PRAUC |
-     |----+----------------+--------+----------+--------+-----------+-------+-------+--------+-------|
-     |  1 | 16,8           |     10 |     0.93 |   0.78 |      0.21 | 0.334 | 0.508 |  0.955 | 0.377 |
-     | 1b | 32,8           |      5 |     0.92 |   0.81 |      0.19 | 0.312 | 0.494 |  0.958 | 0.431 |
+     #+begin_example
+    The best results were obtained by setting the model architecture
+    as =(inputs, 16) -> (16, 8) -> (8,1)= with a recall of 0.81. The
+    results were deemed good enough for this model and thus
+    experiments for the PM model were concluded.
+     #+end_example
 
 * Graph Community Detection
-  This section describes the stratergies explored to replce the /Graph
+  This section describes the strategies explored to replace the /Graph
   Community Detection/ step for the existing data processing pipeline.
 
+** Primer on Graph Neural Networks
+   It is important to understand the different applications of Graph
+   Neural Networks (GNNs) before we proceed. GNNs have two primary
+   applications:
+   1. *Node classification* which is a semi-supervised learning
+      setting. The idea is that given a graph with partial labels, we
+      want to conduct label propagation.
+   2. *Graph classification* which is a supervised learning setting.
+      Here we have several graphs with a corresponding label and we
+      want to classify them.
+
+   In this project we use graph classification.
+
 ** Approach
-   The output of the /Pattern Matrix/ model is a one dimensional
-   vector consisting binary values {0, 1}. However, it can be "folded"
-   back into a (n, n) adjacency matrix (where n is the number of
-   samples).
-
-   The adjacency matrix can be converted into a graph which serves as
-   the training data for the model.
+   Let's say we have data for timeslices in the form of =(n, 5)=
+   dataframe (5 features because =x, y, z, t and label=).
    
-   Graph Convolutional Neural Networks (GconvNN) are used to train on
-   graphs created using the output of the /Pattern Matrix/ model. The
-   idea being, existance of connected nodes indicate that the
-   timeslice contains hits from neutrino events.
+   Each timeslice is a graph where each hit (row of dataframe) is
+   represented by a node and all nodes are connected by undirected
+   edges. It's label can be obtained by looking at the number of event
+   hits present and setting it to 1 if the count is above a certain
+   threshold. Each node of the graph has an embedding/feature vector
+   corresponding to the =(4,)= feature vector (row of the dataframe).
 
+   Two approaches are considered:
+   1. Train a model with no edge information
+   2. Train a model with additional edge information from the PM model
+      
 * References
 + [goodfellow2016deep] :: Goodfellow, I., Bengio, Y., Courville, A., &
   Bengio, Y. (2016). Deep learning (Vol. 1). Cambridge: MIT press.
