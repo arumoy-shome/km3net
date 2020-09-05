@@ -98,7 +98,7 @@ def evaluate(model, optimizer, criterion, epochs, device, train_dl, valid_dl, te
     epochs -> Int, number of epochs to train, defaults to 10.
     train_dl -> DataLoader, training set
     valid_dl -> DataLoader, validation set
-    test_dl -> DataLoader, test set
+    test_dl -> List, containing test set(s)
 
     Out
     ---
@@ -128,16 +128,17 @@ def evaluate(model, optimizer, criterion, epochs, device, train_dl, valid_dl, te
 
     print('---')
     model.eval()
-    y_true, y_pred, y_score = test(test_dl, model, device)
-
-    metrics = {
-        'train_losses': train_losses,
-        'y_true': y_true,
-        'y_pred': y_pred,
-        'y_score': y_score,
-        'model': model
-    }
-    metrics['valid_losses'] = valid_losses if valid_dl else None
+    metrics = []
+    for idx, dl in enumerate(test_dl):
+        y_true, y_pred, y_score = test(dl, model, device)
+        metrics.append({
+            'train_losses': train_losses,
+            'y_true': y_true,
+            'y_pred': y_pred,
+            'y_score': y_score,
+            'model': model
+            })
+        metrics[idx]['valid_losses'] = valid_losses if valid_dl else None
 
     return metrics
 
