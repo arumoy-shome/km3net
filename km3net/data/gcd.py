@@ -12,8 +12,6 @@ def get_label(relations):
     """
     return np.amax(relations)
 
-
-
 def process(relations, olen):
     """
     In

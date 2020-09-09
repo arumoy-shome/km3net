@@ -1,3 +1,4 @@
+from sklearn.utils import shuffle
 import pandas as pd
 import os
 
@@ -28,3 +29,24 @@ def get_timeslice_with_hits(data, n=1, index=False, largest=True):
     else:
         return df
 
+def equalise_targets(df):
+    """
+    In
+    --
+    df -> (n, m) dataframe, with 'label' column
+
+    Expects
+    -------
+    minority class to be label 1
+
+    Out
+    ---
+    df -> (l, k) dataframe, equalized targets (majority class undersampled)
+    """
+    minority = df[df['label'] == 1]
+    majority = df[df['label'] == 0]
+    size = min(len(minority), len(majority))
+    eqdf = pd.concat([minority, majority.sample(size)])
+    eqdf = shuffle(eqdf)
+
+    return eqdf
