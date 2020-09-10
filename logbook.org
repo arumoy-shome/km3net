@@ -247,6 +247,36 @@
    1. Train a model with no edge information
    2. Train a model with additional edge information from the PM model
       
+** Future Work
+   Several alternative paths of research are touched upon in this section.
+
+*** Modeling the data as a heterogeneous graph
+    Instead of treating nodes of the same entity (ie. a hit), we can
+    consider two different kinds: event nodes and noise nodes.
+
+*** Advanced relations from PM model
+    The PM model is naive as it only treats event-event pairs from the
+    same event as related and the rest as unrelated. This is too
+    simplistic since noise-noise pairs are also related and
+    event-event pairs from different events are related (since they
+    are both event hits) but perhaps to a lesser degree than pairs
+    from the same event.
+
+    We can make the PM model a 4 class classifier such that it
+    classifying the pair type (event-event-same, event-event-different
+    event-noise and noise-noise). This can be further utilized to
+    assign varying weights or edge-types to the edges of the graph.
+
+*** Modeling the problem as a graph classification task
+    We can construct a graph from a given timeslice and train a model
+    to classify it as =SAVE= or =NOSAVE= based on presence of events.
+    At the time of writing this, the best approach to create the
+    dataset is unclear.
+
+*** Better node and/or edge features
+    The node feature and the edge features can be improved such that
+    it is more meaningful to the model.
+
 * References
 + [goodfellow2016deep] :: Goodfellow, I., Bengio, Y., Courville, A., &
   Bengio, Y. (2016). Deep learning (Vol. 1). Cambridge: MIT press.
