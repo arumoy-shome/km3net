@@ -9,17 +9,17 @@ import os
 if __name__ == "__main__":
     forward = 'n'
     path = DATADIR + input('source data file: ')
-    name = DATADIR + input('name of final data file: ')
-    equalise = input("equalise targets? [y/n]: ")
+    prefix = DATADIR + input('prefix for the final data file(s): ')
+    equalise = input('equalise targets? [y/n]: ')
     frac = float(input('frac: '))
-    save = input("save to disk? [y/n]: ")
+    save = input('save to disk? [y/n]: ')
 
     while not os.path.isfile(path):
         print('{0} does not exist!'.format(path))
-        path = DATADIR+input('path? :')
+        path = DATADIR+input('source data file: ')
 
     print("source file: {0}".format(path))
-    print("final file: {0}".format(name))
+    print("final file prefix: {0}".format(prefix))
     print("frac: {0}".format(frac))
     master = input("proceed? [y/n]: ")
 
@@ -36,14 +36,6 @@ if __name__ == "__main__":
         print("Shape of noise: {0}".format(sample[sample['label'] == 0].shape))
         forward = input("proceed? [y/n]: ")
 
-    # create pair-wise dataset
-    print("creating pair-wise dataset...")
-    sample = process(sample)
-    print("---")
-    print("Shape of processed sample: {0}".format(sample.shape))
-    print("Shape of related: {0}".format(sample[sample['label'] == 1].shape))
-    print("Shape of unrelated: {0}".format(sample[sample['label'] == 0].shape))
-
     # equalize tragets
     if equalise.lower() == 'y':
         print("equalizing targets...")
@@ -53,8 +45,18 @@ if __name__ == "__main__":
         print("Shape of related: {0}".format(sample[sample['label'] == 1].shape))
         print("Shape of unrelated: {0}".format(sample[sample['label'] == 0].shape))
 
-    if save.lower() == 'y':
-        sample.to_csv(name, index=False, header=False)
+    print("saving {}".format(prefix+'-equal.csv'))
+    sample.to_csv(prefix+'-equal.csv', index=False, header=False)
+
+    # create pair-wise dataset
+    print("creating pair-wise dataset...")
+    sample = process(sample)
+    print("---")
+    print("Shape of processed sample: {0}".format(sample.shape))
+    print("Shape of related: {0}".format(sample[sample['label'] == 1].shape))
+    print("Shape of unrelated: {0}".format(sample[sample['label'] == 0].shape))
+
+    print("saving {}".format(prefix+'-explode.csv'))
+    sample.to_csv(prefix+'-explode.csv', index=False, header=False)
 
     print("DONE")
-

@@ -26,7 +26,7 @@ def add_label(df):
 
     return df
 
-def explode(df):
+def explode(df, model='pm'):
     """
     In
     --
@@ -56,25 +56,30 @@ def explode(df):
         dup = dup.rename(columns=p1_col_names)
         dup = pd.concat([dup, df], axis=1)
         dup = dup.rename(columns=p2_col_names)
-        dup = dup[dup['id2'] > dup['id1']]
+        if model == 'gcd':
+            dup = dup[dup['id2'] != dup['id1']]
+        else:
+            dup = dup[dup['id2'] > dup['id1']]
+
         result = pd.concat([result, dup])
 
     return result
 
-def process(df, drop=True):
+def process(df, drop=True, model='pm'):
     """
     In
     --
     df -> dataframe, ideally should be a sample of the processed dataset.
     drop -> Bool, drop columns not required for training. They are: 'l1',
     'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'.
+    model -> Str, 'pm' or 'gcd'
 
     Out
     ---
     df -> dataframe, 'exploded', related label added, unwanted columns
     dropped.
     """
-    df = explode(df)
+    df = explode(df, model=model)
     df = add_label(df)
     df = df.drop(columns=['l1', 'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'])
 
