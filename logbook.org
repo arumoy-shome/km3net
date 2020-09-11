@@ -215,10 +215,35 @@
     experiments for the PM model were concluded.
      #+end_example
 
+** Future Work
+   Improvements that can be made to the MLP model.
 * Graph Community Detection
   This section describes the strategies explored to replace the /Graph
   Community Detection/ step for the existing data processing pipeline.
 
+** TODO Why we do not need graphConv
+   :LOGBOOK:
+   - Note taken on [2020-09-11 Fri 16:41] \\
+     still pondering over this, we cannot have a perfect MLP so the idea is
+     to augment the superior GNN model with edge info from the MLP.
+   :END:
+   Or, why the graph approach is a different research direction
+   altogether.
+   Our end goal is : *Given a timeslice, should I save it?*
+   If we put 100% faith and trust in the simulated data, and we train
+   a neural network to identify hits which are related to each other
+   (ie. they originated from the same event). Then, presence of
+   related hits above a certain threshold (say 10) directly implies
+   that the timeslice is worth saving.
+
+   Graph neural networks on the other hand work on different
+   principles. Most relevant to this project would be to do node
+   classification which is a semi supervised form of learning. Given
+   labels for some of the nodes, the network can predict labels for
+   the rest.
+
+   Given that a MLP is much simpler, it should be the preferred over
+   Graph Networks.
 ** Primer on Graph Neural Networks
    It is important to understand the different applications of Graph
    Neural Networks (GNNs) before we proceed. GNNs have two primary
@@ -247,6 +272,65 @@
    1. Train a model with no edge information
    2. Train a model with additional edge information from the PM model
       
+** Data Preparation
+   The data prepartion is two fold:
+   1. *Prepare data for node classification*: in this case we only
+      need a single csv file of =(n,5)= shape where the first 4 column
+      are the node features and the last the node label. We require
+      another csv of shape =(n**2-n,)= representing the edge weights.
+      The csvs must be saved without headers and index.
+   2. *Prepare data for graph classification*: this is more involved
+      since now we need to create several graphs with a corresponding
+      label. The process is the same however we assign the label for
+      the graph based on the number of event nodes (if it is above a
+      certain threshold N then assign a label of 1 to the graph).
+
+*** Data for Node classification
+    This is simple enough, all we do is take a good mix of event and
+    noise nodes, concat and save. We do not have to care about
+    shuffling or ordering of the rows since we use a fully connected
+    graph and the edge weights are derived from the event ids using
+    `km3net.data.model.process`.
+
+    We prepare several versions of the training dataset with varying
+    number of nodes (100, 500, 1000) but equal classes. The test
+    dataset consists of 4 datasets with varying number of examples per
+    class.
+** Future Work
+   Several alternative paths of research are touched upon in this section.
+
+*** CANCELLED Modeling the data as a heterogeneous graph
+    :LOGBOOK:
+    - State "CANCELLED"  from              [2020-09-11 Fri 16:35] \\
+      This may not be feasible for the data we have since different
+      entities/node types can be associated with different sets of labels.
+    :END:
+    Instead of treating nodes of the same entity (ie. a hit), we can
+    consider two different kinds: event nodes and noise nodes.
+
+*** Advanced relations from PM model
+    The PM model is naive as it only treats event-event pairs from the
+    same event as related and the rest as unrelated. This is too
+    simplistic since noise-noise pairs are also related and
+    event-event pairs from different events are related (since they
+    are both event hits) but perhaps to a lesser degree than pairs
+    from the same event.
+
+    We can make the PM model a 4 class classifier such that it
+    classifying the pair type (event-event-same, event-event-different
+    event-noise and noise-noise). This can be further utilized to
+    assign varying weights or edge-types to the edges of the graph.
+
+*** Modeling the problem as a graph classification task
+    We can construct a graph from a given timeslice and train a model
+    to classify it as =SAVE= or =NOSAVE= based on presence of events.
+    At the time of writing this, the best approach to create the
+    dataset is unclear.
+
+*** Better node and/or edge features
+    The node feature and the edge features can be improved such that
+    it is more meaningful to the model.
+
 * References
 + [goodfellow2016deep] :: Goodfellow, I., Bengio, Y., Courville, A., &
   Bengio, Y. (2016). Deep learning (Vol. 1). Cambridge: MIT press.

@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.utils import shuffle
 
 p1_col_names = {'pos_x': 'x1', 'pos_y': 'y1',
                 'pos_z': 'z1', 'time': 't1',
@@ -27,7 +26,7 @@ def add_label(df):
 
     return df
 
-def explode(df):
+def explode(df, model='pm'):
     """
     In
     --
@@ -57,43 +56,30 @@ def explode(df):
         dup = dup.rename(columns=p1_col_names)
         dup = pd.concat([dup, df], axis=1)
         dup = dup.rename(columns=p2_col_names)
-        dup = dup[dup['id2'] > dup['id1']]
+        if model == 'gcd':
+            dup = dup[dup['id2'] != dup['id1']]
+        else:
+            dup = dup[dup['id2'] > dup['id1']]
+
         result = pd.concat([result, dup])
 
     return result
 
-def equalise_targets(df):
-    """
-    In
-    --
-    df -> (n, m) dataframe, ideally should be the "exploded" dataframe
-
-    Out
-    ---
-    df -> (l, k) dataframe, equalized targets (majority class undersampled)
-    """
-    related = df[df['label'] == 1]
-    unrelated = df[df['label'] == 0]
-    size = min(len(related), len(unrelated))
-    eqdf = pd.concat([related, unrelated.sample(size)])
-    eqdf = shuffle(eqdf)
-
-    return eqdf
-
-def process(df, drop=True):
+def process(df, drop=True, model='pm'):
     """
     In
     --
     df -> dataframe, ideally should be a sample of the processed dataset.
     drop -> Bool, drop columns not required for training. They are: 'l1',
     'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'.
+    model -> Str, 'pm' or 'gcd'
 
     Out
     ---
     df -> dataframe, 'exploded', related label added, unwanted columns
     dropped.
     """
-    df = explode(df)
+    df = explode(df, model=model)
     df = add_label(df)
     df = df.drop(columns=['l1', 'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'])
 

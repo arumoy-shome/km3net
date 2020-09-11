@@ -1,94 +1,76 @@
 import pandas as pd
 import torch
-import dgl
-import km3net.data.pm as pm
-import km3net.data.gcd as gcd
-from dgl import DGLGraph
-from torch.utils.data import Dataset, DataLoader
+import networkx as nx
+import torch_geometric as pg
+import torch_geometric.utils as pgutils
+import torch_geometric.data as pgdata
+from sklearn.preprocessing import MinMaxScaler
 
-class GNNDataset(Dataset):
-    def __init__(self, path, n=100, size=20):
-        df = pd.read_csv(path)
-        self.samples = self.generate(n, size, df)
-
-    def __len__(self):
-        """
-        return number of rows in the dataset
-        """
-        return len(self.samples)
-
-    def __getitem__(self, idx):
-        """
-        return a row at specified id
-        """
-        return self.samples[idx]
-
-    def generate(self, n, size, df):
-        samples = []
-
-        for _ in range(n):
-            sample = df.sample(size)
-            sample = pm.process(sample)
-            matrix, label = gcd.process(sample['label'].values, olen=size)
-            matrix, label = matrix.astype('float32'), label.astype('float32')
-            samples.append((DGLGraph(matrix), label))
-
-        return samples
-
-    def get_splits(self, n_test=0.2):
-        test_size = round(n_test * len(self.samples))
-        train_size = len(self.samples) - test_size
-
-        return self.samples[:train_size], self.samples[train_size:]
-
-def collate(samples):
-    graphs, labels = map(list, zip(*samples))
-    batched_graph = dgl.batch(graphs)
-
-    return batched_graph, torch.tensor(labels)
-
-def prepare_train_data(path, n=100, size=20, n_test=0.2):
+def create_graph(df_path, weight_path):
     """
     In
     --
-    path -> Str, path to data file.
-    n -> Int, number of graphs
-    size -> Int, min number of nodes in each graph
-
-    Expects
-    -------
-    `path` to be a valid csv file.
+    df_path -> Str, path to pandas dataframe of shape (n, m) which
+    will translate to a graph with n nodes and each node will be
+    assigned the corresponding (m,) feature vector
+    weight_path -> Str, path to pandas dataframe containing the
+    weights. Ideally this should point to the exploded dataframe where
+    the last column is the label
 
     Out
     ---
-    train_dl, test_dl -> Tuple, contains the train and test DataLoader iterables
+    G -> torch_geometric.data, Graph with n nodes each assigned (m,)
+    feature vector.
     """
-    dataset = GNNDataset(path, n, size)
-    train, test = dataset.get_splits(n_test)
+    df = pd.read_csv(df_path, header=None)
+    weight = pd.read_csv(weight_path, header=None)
+    weight = weight.values[:, -1:].reshape(-1,)
+    G = nx.complete_graph(len(df))
+    G = pgutils.from_networkx(G)
+    X = df.values[:, :4] # extract node feature matrix
+    X = MinMaxScaler().fit_transform(X) # scale between [0,1]
+    X = torch.tensor(X, dtype=torch.float)
+    y = df.values[:, 4:5] # extract node labels
+    y = torch.tensor(y, dtype=torch.float)
+    weight = torch.tensor(weight, dtype=torch.float)
+    G.x, G.y, G.edge_attr  = X, y, weight
 
-    train_dl = DataLoader(train, batch_size=16, shuffle=True, collate_fn=collate)
-    test_dl = DataLoader(test, batch_size=16, shuffle=True, collate_fn=collate)
+    return G
 
-    return train_dl, test_dl
-
-def prepare_test_data(path, n=100, size=20):
+def print_stats(G):
     """
-In
---
-path -> Str, path to data file.
-n -> Int, number of graphs
-size -> Int, min number of nodes in each graph
+    In
+    --
+    G -> torch_geometric.data, Graph
 
-Expects
--------
-`path` to be a valid csv file.
+    Out
+    ---
+    None
+    """
+    print(G)
+    print(f'Number of nodes: {G.num_nodes}')
+    print(f'Number of edges: {G.num_edges}')
+    print(f'Average node degree: {G.num_edges / G.num_nodes:.2f}')
+    print(f'Edge weight shape: {G.edge_attr.shape}')
+    print(f'Contains isolated nodes: {G.contains_isolated_nodes()}')
+    print(f'Contains self-loops: {G.contains_self_loops()}')
+    print(f'Is undirected: {G.is_undirected()}')
 
-Out
----
-test_dl -> DataLoader, test iterable
-"""
-    dataset = GNNDataset(path, n, size)
-    _, test = dataset.get_splits(n_test=1.0)
-    test_dl = DataLoader(test, batch_size=32, shuffle=False, collate_fn=collate)
+def visualize(x, color):
+    """
+    In
+    --
+    x -> (n, m) tensor, node features
+    color -> (n,) tensor, passed to matplotlib.pyplot.scatter
 
-    return test_dl
+    Out
+    ---
+    None
+    """
+    z = TSNE(n_components=2).fit_transform(x.detach().cpu().numpy())
+    plt.figure(figsize=(10,10))
+    plt.xticks([])
+    plt.yticks([])
+    plt.scatter(z[:, 0], z[:, 1], s=70, c=color.detach().cpu().numpy(), cmap="Set2")
+    plt.show()
+

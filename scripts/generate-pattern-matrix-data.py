@@ -1,6 +1,7 @@
 from context import km3net
 from km3net.utils import DATADIR
-import km3net.data.pm as pm
+from km3net.data.model import process
+from km3net.data.utils import equalise_targets
 import pandas as pd
 import sys
 import os
@@ -37,7 +38,7 @@ if __name__ == "__main__":
 
     # create pair-wise dataset
     print("creating pair-wise dataset...")
-    sample = pm.process(sample)
+    sample = process(sample)
     print("---")
     print("Shape of processed sample: {0}".format(sample.shape))
     print("Shape of related: {0}".format(sample[sample['label'] == 1].shape))
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     # equalize tragets
     if equalise.lower() == 'y':
         print("equalizing targets...")
-        sample = pm.equalise_targets(sample)
+        sample = equalise_targets(sample)
         print("---")
         print("Shape of equalised sample: {0}".format(sample.shape))
         print("Shape of related: {0}".format(sample[sample['label'] == 1].shape))
