@@ -258,16 +258,27 @@
    In this project we use graph classification.
 
 ** Approach
+   Both node and graph classification can be applied to our problem.
    Let's say we have data for timeslices in the form of =(n, 5)=
    dataframe (5 features because =x, y, z, t and label=).
-   
-   Each timeslice is a graph where each hit (row of dataframe) is
-   represented by a node and all nodes are connected by undirected
-   edges. It's label can be obtained by looking at the number of event
-   hits present and setting it to 1 if the count is above a certain
-   threshold. Each node of the graph has an embedding/feature vector
-   corresponding to the =(4,)= feature vector (row of the dataframe).
 
+   For the graph classification approach, each timeslice is a graph
+   where each hit (row of dataframe) is represented by a node and all
+   nodes are connected by undirected edges. It's label can be obtained
+   by looking at the number of event hits present and setting it to 1
+   if the count is above a certain threshold. Each node of the graph
+   has an embedding/feature vector corresponding to the =(4,)= feature
+   vector (row of the dataframe).
+
+   For the node classification approach, the setup is similar however,
+   now each node has a label (event or noise) and the training data
+   consists of a single graph.
+
+   Further, two approaches can be experimented with:
+   1. Train the model with no edge information
+   2. Train the model with additional edge information from the PM model
+
+** Experiments
    Two approaches are considered:
    1. Train a model with no edge information
    2. Train a model with additional edge information from the PM model
