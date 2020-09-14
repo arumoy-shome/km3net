@@ -65,7 +65,25 @@ def explode(df, model='pm'):
 
     return result
 
-def process(df, drop=True, model='pm'):
+def take_diff(df):
+    """
+    In
+    --
+    df -> (n, 9) dataframe, ideally should be the exploded dataframe.
+
+    Out
+    ---
+    df -> (n, 5) dataframe, with only the difference of the x,y,z,t features.
+    """
+    df['x'] = df['x1'] - df['x2']
+    df['y'] = df['y1'] - df['y2']
+    df['z'] = df['z1'] - df['z2']
+    df['t'] = df['t1'] - df['t2']
+    df = df[['x', 'y', 'z', 't', 'label']]
+
+    return df
+
+def process(df, drop=True, diff=True, model='pm'):
     """
     In
     --
@@ -73,6 +91,7 @@ def process(df, drop=True, model='pm'):
     drop -> Bool, drop columns not required for training. They are: 'l1',
     'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'.
     model -> Str, 'pm' or 'gcd'
+    diff -> Bool, take difference of x,y,z,t features, defaults to True.
 
     Out
     ---
@@ -82,5 +101,6 @@ def process(df, drop=True, model='pm'):
     df = explode(df, model=model)
     df = add_label(df)
     df = df.drop(columns=['l1', 'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'])
+    df = take_diff(df) if diff else None
 
     return df
