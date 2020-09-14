@@ -161,7 +161,6 @@
      | model architecture  | (inputs, 10) -> (10,8) -> (8, 1)       |
      | activation (hidden) | ReLu                                   |
      | activation (output) | Sigmoid                                |
-     | #samples (testing)  | 364231                                 |
 
      #+begin_example
      The slice-mixed-10-equal-diff dataset produced the best results.
@@ -217,12 +216,31 @@
 
 ** Future Work
    Improvements that can be made to the MLP model.
+   
+*** Advanced relations
+    The PM model is naive as it only treats event-event pairs from the
+    same event as related and the rest as unrelated. This is too
+    simplistic since noise-noise pairs are also related and
+    event-event pairs from different events are related (since they
+    are both event hits) but perhaps to a lesser degree than pairs
+    from the same event.
+
+    We can make the PM model a 4 class classifier such that it
+    classifying the pair type (event-event-same, event-event-different
+    event-noise and noise-noise). This can be further utilized to
+    assign varying weights or edge-types to the edges of the graph.
+
 * Graph Community Detection
   This section describes the strategies explored to replace the /Graph
   Community Detection/ step for the existing data processing pipeline.
 
-** TODO Why we do not need graphConv
+** CANCELLED Why we do not need graphConv
    :LOGBOOK:
+   - State "CANCELLED"  from "TODO"       [2020-09-14 Mon 20:40] \\
+     The GNN cannot be trained solely on the =(x,y,z,t)= node features. For
+     that to work we would need a really well crafted training data which
+     does not introduce any bias in terms of the position and direction of
+     hits (courtesy of Ben Werkhooven).
    - Note taken on [2020-09-11 Fri 16:41] \\
      still pondering over this, we cannot have a perfect MLP so the idea is
      to augment the superior GNN model with edge info from the MLP.
@@ -254,83 +272,98 @@
    2. *Graph classification* which is a supervised learning setting.
       Here we have several graphs with a corresponding label and we
       want to classify them.
-
-   In this project we use graph classification.
+      
+   In this project the data is modeled to facilitate *node classification*.
 
 ** Approach
-   Both node and graph classification can be applied to our problem.
    Let's say we have data for timeslices in the form of =(n, 5)=
-   dataframe (5 features because =x, y, z, t and label=).
+   dataframe (5 features because =x, y, z, t and label=). Each row,
+   then can be represented as a node with =(x,y,z,t)= as its feature
+   vector with a corresponding =label= to indicate if it is a event or
+   a noise node.
 
-   For the graph classification approach, each timeslice is a graph
-   where each hit (row of dataframe) is represented by a node and all
-   nodes are connected by undirected edges. It's label can be obtained
-   by looking at the number of event hits present and setting it to 1
-   if the count is above a certain threshold. Each node of the graph
-   has an embedding/feature vector corresponding to the =(4,)= feature
-   vector (row of the dataframe).
+   We can experiment with the edge attributes of the graph:
+   1. No edge attributes: ie. only node features are provided
+   2. Scalar edge attributes of shape =(num_edges,)= ie. each edge has
+      a 1d weight between [0, 1], obtained from the PM model
+   3. Vector edge attributes of shape =(num_edges, m)= ie. each edge
+      has column vector of shape =(m,)= as the weight.
 
-   For the node classification approach, the setup is similar however,
-   now each node has a label (event or noise) and the training data
-   consists of a single graph.
-
-   Further, two approaches can be experimented with:
-   1. Train the model with no edge information
-   2. Train the model with additional edge information from the PM model
-
-** Experiments
-   Two approaches are considered:
-   1. Train a model with no edge information
-   2. Train a model with additional edge information from the PM model
-      
+   Results and conclusions from each experiment can be found in the
+   [[*Experiments][Experiments]] section below.
+   
 ** Data Preparation
-   The data prepartion is two fold:
-   1. *Prepare data for node classification*: in this case we only
-      need a single csv file of =(n,5)= shape where the first 4 column
-      are the node features and the last the node label. We require
-      another csv of shape =(n**2-n,)= representing the edge weights.
-      The csvs must be saved without headers and index.
-   2. *Prepare data for graph classification*: this is more involved
-      since now we need to create several graphs with a corresponding
-      label. The process is the same however we assign the label for
-      the graph based on the number of event nodes (if it is above a
-      certain threshold N then assign a label of 1 to the graph).
+   The training data consists of a =(n, 4)= node feature matrix, =(n,
+   )= column vector of node labels and =(num_edges,)= column vector of
+   edge weights. The node feature matrix and labels are easily
+   obtained from the main dataset. The edge weights can be obtained
+   from the output of =km3net.data.model.process()= and selecting the
+   label column.
 
-*** Data for Node classification
-    This is simple enough, all we do is take a good mix of event and
-    noise nodes, concat and save. We do not have to care about
-    shuffling or ordering of the rows since we use a fully connected
-    graph and the edge weights are derived from the event ids using
-    `km3net.data.model.process`.
+   Note that pytorch geometric requires that =num_edges= be of length
+   $n^{2} - n$. To facilitate this, =km3net.data.model.process()=
+   accepts a =model= parameter which should be set to 'gcd'.
+   
+** Evaluation
+   Evaluation is done using the same datasets and metrics used for the
+   PM model (see [[*Evaluation][Evaluation]]).
+   
+** Experiments
+   To summarize, training the model with edge weights produced the
+   best results with a high precision and recall for *both* classes
+   (ie. false positives and negatives are low).
 
-    We prepare several versions of the training dataset with varying
-    number of nodes (100, 500, 1000) but equal classes. The test
-    dataset consists of 4 datasets with varying number of examples per
-    class.
+   Assigning a =(n,)= column vector instead of a scaler as edge features was
+   deemed beyond the scope of this project. This requires the data to
+   be modeled as a heterogeneous graph with 'n' types of edges each
+   carrying the corresponding scalar weight.
+
+   The following parameters were kept constant across all experiments:
+     | parameter           | value                            |
+     |---------------------+----------------------------------|
+     | loss                | BCELoss                          |
+     | optimizer           | Adam with =lr\=0.01=             |
+     | model architecture  | (inputs, 16) -> (16,2) -> (2, 1) |
+     | activation (hidden) | ReLu                             |
+     | activation (output) | Sigmoid                          |
+
+     A Graph convolusional layer was used for Layer 1 and 2 whilst a
+     Linear layer was used as the final layer to perform the final
+     classification.
+
+   Details for each experiment follow.
+   
+*** No edge features
+    Model was trained using no edge features for varying sizes of
+    training data.
+
+    #+begin_example
+    Resulted in a no skill classifier.
+    #+end_example
+
+*** Scalar edge features
+    Weights were assigned to the edges. A weight of 1 was assigned to
+    nodes which are 'causally related' (see [[*MLP to predict /causally related/ points][MLP to predict /causally
+    related/ points]]) whilst a weight of 0 was assigned to others (this
+    is mimicking the output of the PM model).
+
+    #+begin_example
+    Model with high precision and recall for both classes
+    was obtained using a training set of 2000 nodes.
+    #+end_example
+    
+*** CANCELLED Vector edge features
+    :LOGBOOK:
+    - State "CANCELLED"  from              [2020-09-14 Mon 21:07]
+    :END:
+    This is possible to do however was deemed beyond the scope of this
+    project see [[*Experiments][Experiments]] for reasoning.
+    
 ** Future Work
    Several alternative paths of research are touched upon in this section.
 
-*** CANCELLED Modeling the data as a heterogeneous graph
-    :LOGBOOK:
-    - State "CANCELLED"  from              [2020-09-11 Fri 16:35] \\
-      This may not be feasible for the data we have since different
-      entities/node types can be associated with different sets of labels.
-    :END:
-    Instead of treating nodes of the same entity (ie. a hit), we can
-    consider two different kinds: event nodes and noise nodes.
-
-*** Advanced relations from PM model
-    The PM model is naive as it only treats event-event pairs from the
-    same event as related and the rest as unrelated. This is too
-    simplistic since noise-noise pairs are also related and
-    event-event pairs from different events are related (since they
-    are both event hits) but perhaps to a lesser degree than pairs
-    from the same event.
-
-    We can make the PM model a 4 class classifier such that it
-    classifying the pair type (event-event-same, event-event-different
-    event-noise and noise-noise). This can be further utilized to
-    assign varying weights or edge-types to the edges of the graph.
+*** Modeling the data as a heterogeneous graph
+    To accommodate [[*Vector edge features][Vector edge features]] experiment.
 
 *** Modeling the problem as a graph classification task
     We can construct a graph from a given timeslice and train a model
@@ -338,9 +371,35 @@
     At the time of writing this, the best approach to create the
     dataset is unclear.
 
+    Here, each timeslice is a graph where each hit (row of dataframe)
+    is represented by a node and all nodes are connected by undirected
+    edges. It's label can be obtained by looking at the number of
+    event hits present and setting it to 1 if the count is above a
+    certain threshold. Each node of the graph has an embedding/feature
+    vector corresponding to the =(4,)= feature vector (row of the
+    dataframe).
+
 *** Better node and/or edge features
     The node feature and the edge features can be improved such that
     it is more meaningful to the model.
+
+* Pipeline
+  This section describes the experimentation and evaluation of the
+  entire data processing pipeline.
+
+** Approach
+   The best model from the two previous steps namely "Pattern Matrix"
+   and "Graph Community Detection" were used to construct the pipeline
+   which given a timeslice can predict if it should be saved or not
+   saved based on the presence of hits from neutrino events.
+
+** TODO Data Preparation
+
+** TODO Evaluation
+
+** TODO Experiments
+
+** TODO Future Work
 
 * References
 + [goodfellow2016deep] :: Goodfellow, I., Bengio, Y., Courville, A., &
