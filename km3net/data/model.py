@@ -79,7 +79,6 @@ def take_diff(df):
     df['y'] = df['y1'] - df['y2']
     df['z'] = df['z1'] - df['z2']
     df['t'] = df['t1'] - df['t2']
-    df = df[['x', 'y', 'z', 't', 'label']]
 
     return df
 
@@ -100,7 +99,9 @@ def process(df, drop=True, diff=True, model='pm'):
     """
     df = explode(df, model=model)
     df = add_label(df)
-    df = df.drop(columns=['l1', 'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'])
-    df = take_diff(df) if diff else None
+    if drop:
+        df = df.drop(columns=['l1', 'eid1', 'ts1', 'id1', 'l2', 'eid2', 'ts2', 'id2'])
+    if diff:
+        df = take_diff(df)
 
     return df
