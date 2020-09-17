@@ -158,37 +158,36 @@ def get_device():
 
 def save_model(model, path):
     """
-In
---
-model -> torch.nn, model to save
-path -> Str, path to save state_dict of model
+    In
+    --
+    model -> torch.nn, model to save
+    path -> Str, path to save state_dict of model
 
-Expects
--------
-path to be valid
+    Expects
+    -------
+    path to be valid
 
-Out
----
-None
-"""
+    Out
+    ---
+    None
+    """
     torch.save(model.state_dict(), path)
 
 def load_model(model, path):
     """
-In
---
-model -> torch.nn, instance of model class to load
-path -> Str, path where model's state_dict is saved
+    In
+    --
+    model -> torch.nn, instance of model class to load
+    path -> Str, path where model's state_dict is saved
 
-Expects
--------
-path to be valid
+    Expects
+    -------
+    path to be valid
 
-Out
----
-model -> torch.nn, loaded pytorch model in eval mode
-"""
-    model = model
+    Out
+    ---
+    model -> torch.nn, loaded pytorch model in eval mode
+    """
     model.load_state_dict(torch.load(path))
     model.eval()
 
