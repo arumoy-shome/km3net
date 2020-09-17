@@ -3,13 +3,13 @@ from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import Dataset, DataLoader, random_split
 
 class MLPDataset(Dataset):
-    def __init__(self, X, y, scale=False):
+    def __init__(self, X, y, scale=True):
         """
         In
         --
         X -> (n, m) ndarray, containing the features
         y -> (n,) ndarray, containing the labels
-        scale -> Bool, whether to scale data between [0, 1], defaults to False
+        scale -> Bool, whether to scale data between [0, 1], defaults to True
 
         Out
         ---
@@ -42,12 +42,12 @@ class MLPDataset(Dataset):
 
         return random_split(self, [train_size, test_size])
 
-def prepare_train_data(path, scale=False, n_test=0.33):
+def prepare_train_data(path, scale=True, n_test=0.33):
     """
     In
     --
     path -> Str, path to data file.
-    scale -> Bool, scale data between [0, 1], defaults to False.
+    scale -> Bool, scale data between [0, 1], defaults to True.
 
     Expects
     -------
@@ -65,12 +65,12 @@ def prepare_train_data(path, scale=False, n_test=0.33):
 
     return train_dl, test_dl
 
-def prepare_test_data(path, scale=False):
+def prepare_test_data(path, scale=True):
     """
     In
     --
     path -> Str, path to data file.
-    scale -> Bool, scale data between [0, 1], defaults to False.
+    scale -> Bool, scale data between [0, 1], defaults to True.
 
     Expects
     -------
