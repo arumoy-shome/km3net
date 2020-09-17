@@ -3,14 +3,23 @@ from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import Dataset, DataLoader, random_split
 
 class MLPDataset(Dataset):
-    def __init__(self, path, normalise=False):
-        df = pd.read_csv(path, header=None)
-        self.X = df.values[:, :-1]
-        self.y = df.values[:, -1]
+    def __init__(self, X, y, scale=False):
+        """
+        In
+        --
+        X -> (n, m) ndarray, containing the features
+        y -> (n,) ndarray, containing the labels
+        scale -> Bool, whether to scale data between [0, 1], defaults to False
+
+        Out
+        ---
+        dataset -> torch.utils.data.Dataset, object
+        """
+        self.X = X
         self.X = self.X.astype('float32')
         self.y = self.y.astype('float32')
-        if normalise:
-            self.normalise()
+        if scale:
+            self.scale()
 
     def __len__(self):
         """
@@ -24,7 +33,7 @@ class MLPDataset(Dataset):
         """
         return [self.X[idx], self.y[idx]]
 
-    def normalise(self):
+    def scale(self):
         self.X = MinMaxScaler().fit_transform(self.X)
 
     def get_splits(self, n_test=0.33):
@@ -33,12 +42,12 @@ class MLPDataset(Dataset):
 
         return random_split(self, [train_size, test_size])
 
-def prepare_train_data(path, normalise=False, n_test=0.33):
+def prepare_train_data(path, scale=False, n_test=0.33):
     """
     In
     --
     path -> Str, path to data file.
-    normalise -> Bool, normalise data between [0, 1], defaults to False.
+    scale -> Bool, scale data between [0, 1], defaults to False.
 
     Expects
     -------
@@ -48,7 +57,7 @@ def prepare_train_data(path, normalise=False, n_test=0.33):
     ---
     train_dl, test_dl -> Tuple, contains the train and test DataLoader iterables
     """
-    dataset = MLPDataset(path, normalise=normalise)
+    dataset = MLPDataset(path, scale=scale)
     train, test = dataset.get_splits(n_test)
 
     train_dl = DataLoader(train, batch_size=16, shuffle=True)
@@ -56,12 +65,12 @@ def prepare_train_data(path, normalise=False, n_test=0.33):
 
     return train_dl, test_dl
 
-def prepare_test_data(path, normalise=False):
+def prepare_test_data(path, scale=False):
     """
     In
     --
     path -> Str, path to data file.
-    normalise -> Bool, normalise data between [0, 1], defaults to False.
+    scale -> Bool, scale data between [0, 1], defaults to False.
 
     Expects
     -------
@@ -71,7 +80,7 @@ def prepare_test_data(path, normalise=False):
     ---
     test_dl -> test DataLoader iterable
     """
-    dataset = MLPDataset(path, normalise=normalise)
+    dataset = MLPDataset(path, scale=scale)
     _, test = dataset.get_splits(n_test=1.0)
     test_dl = DataLoader(test, batch_size=32, shuffle=False)
 
