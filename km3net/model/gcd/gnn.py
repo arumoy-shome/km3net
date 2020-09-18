@@ -1,5 +1,5 @@
 import torch.nn.functional as F
-from torch.nn import Module
+from torch.nn import Module, Linear
 from torch_geometric.nn import GCNConv
 
 class GNN(Module):
