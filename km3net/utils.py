@@ -3,6 +3,7 @@ import sys
 
 ROOTDIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 DATADIR = os.path.join(ROOTDIR, 'data')
+MODELDIR = os.path.join(ROOTDIR, 'model')
 
 __POSITIVE_RESPONSES = ['y', 'yes']
 def yes(response):

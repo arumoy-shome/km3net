@@ -6,34 +6,35 @@ import torch_geometric.utils as pgutils
 import torch_geometric.data as pgdata
 from sklearn.preprocessing import MinMaxScaler
 
-def create_graph(df_path, weight_path):
+def create_graph(X, y, w, scale=True):
     """
     In
     --
-    df_path -> Str, path to pandas dataframe of shape (n, m) which
-    will translate to a graph with n nodes and each node will be
-    assigned the corresponding (m,) feature vector
-    weight_path -> Str, path to pandas dataframe containing the
-    weights. Ideally this should point to the exploded dataframe where
-    the last column is the label
+    X -> (n, m) ndarray, which will translate to a graph with n nodes and each
+    node will be assigned the corresponding (m,) feature vector
+    w -> (n**2-n,) ndarray, weights for the edges.
+    y -> (n,) ndarray, node labels
+    scale -> Bool, whether to scale X between [0, 1], defaults to True.
+
+    Expects
+    -------
+    y to be same length as X (number of labels should be same as number of
+    nodes)
+    w to be same length as number of edges of the graph
 
     Out
     ---
-    G -> torch_geometric.data, Graph with n nodes each assigned (m,)
-    feature vector.
+    G -> torch_geometric.data, Graph with n nodes, G.x assigned X, G.y
+    assigned to y and G.edge_attr assigned to w.
     """
-    df = pd.read_csv(df_path, header=None)
-    weight = pd.read_csv(weight_path, header=None)
-    weight = weight.values[:, -1:].reshape(-1,)
-    G = nx.complete_graph(len(df))
+    G = nx.complete_graph(len(X))
     G = pgutils.from_networkx(G)
-    X = df.values[:, :4] # extract node feature matrix
-    X = MinMaxScaler().fit_transform(X) # scale between [0,1]
+    if scale:
+        X = MinMaxScaler().fit_transform(X) # scale between [0,1]
     X = torch.tensor(X, dtype=torch.float)
-    y = df.values[:, 4:5] # extract node labels
     y = torch.tensor(y, dtype=torch.float)
-    weight = torch.tensor(weight, dtype=torch.float)
-    G.x, G.y, G.edge_attr  = X, y, weight
+    w = torch.tensor(w, dtype=torch.float)
+    G.x, G.y, G.edge_attr  = X, y, w
 
     return G
 

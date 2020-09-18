@@ -347,9 +347,13 @@
     related/ points]]) whilst a weight of 0 was assigned to others (this
     is mimicking the output of the PM model).
 
+    Experiments were conducted with varying model architecture,
+    learning rate, weight decay and probability threshold.
+
     #+begin_example
-    Model with high precision and recall for both classes
-    was obtained using a training set of 2000 nodes.
+    The model is highly biased to the positive class, the probability
+    threshold is set to 0.99 to obtain a decent model with an accuracy
+    of 0.7
     #+end_example
     
 *** CANCELLED Vector edge features
