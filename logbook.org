@@ -216,6 +216,10 @@
 
 ** Future Work
    Improvements that can be made to the MLP model.
+
+   The MLP can be replaced with a GNN to perform edge type
+   classification. The Pytorch Geometric has an implementation of the
+   EdgeConv network.
    
 *** Advanced relations
     The PM model is naive as it only treats event-event pairs from the
@@ -366,6 +370,16 @@
 ** Future Work
    Several alternative paths of research are touched upon in this section.
 
+*** Limited testing and experimentation
+    Due to pytorch being built from source and the viltstift not
+    having Nvidia GPUs, pytorch geometric could not be installed as it
+    cannot run on AMD hardware.
+
+    As a result, experimentation had to be done on Google Colab which
+    puts restrictions on disk space and memory. Due to these
+    limitations, models could only be trained on graphs with a max on
+    1000 nodes and tested with graphs of similar size.
+
 *** Modeling the data as a heterogeneous graph
     To accommodate [[*Vector edge features][Vector edge features]] experiment.
 
@@ -386,6 +400,15 @@
 *** Better node and/or edge features
     The node feature and the edge features can be improved such that
     it is more meaningful to the model.
+
+*** Advanced scalar edge features
+    The current edge features are simplistic as a really high weight
+    (of 1) if assigned to event nodes from the same event thus all
+    other edge types 1. (event-event diff event id) 2. event-noise
+    and 3. noise-noise edges have a weight of 0.
+
+    Edges can instead be given a weight based on the type of edge,
+    with the hopes that it helps the network classify the nodes better.
 
 * Pipeline
   This section describes the experimentation and evaluation of the
