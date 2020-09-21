@@ -346,20 +346,67 @@
     #+end_example
 
 *** Scalar edge features
-    Weights were assigned to the edges. A weight of 1 was assigned to
-    nodes which are 'causally related' (see [[*MLP to predict /causally related/ points][MLP to predict /causally
-    related/ points]]) whilst a weight of 0 was assigned to others (this
-    is mimicking the output of the PM model).
+      Weights were assigned to the edges. A weight of 1 was assigned to
+      nodes which are 'causally related' (see [[*MLP to predict /causally related/ points][MLP to predict /causally
+      related/ points]]) whilst a weight of 0 was assigned to others (this
+      is mimicking the output of the PM model).
 
-    Experiments were conducted with varying model architecture,
-    learning rate, weight decay and probability threshold.
+      Experiments were conducted with varying model architecture,
+      learning rate, weight decay and probability threshold.
 
-    #+begin_example
-    The model is highly biased to the positive class, the probability
-    threshold is set to 0.99 to obtain a decent model with an accuracy
-    of 0.7
-    #+end_example
+      #+begin_example
+      The model is highly biased to the positive class, the probability
+      threshold is set to 0.99 to obtain a decent model with an accuracy
+      of 0.7
+      #+end_example
     
+**** [exp,gcd] advanced weights
+     *Motivation* Model is highly skewed to positive class when trained
+     with naive weights. Probability threshold manipulation produces a
+     brittle model (the threshold changes with the shape and size of the
+     training set).
+
+     *Hypothesis* Instead, we assign weights to edges based on the type
+     of node:
+     + noise-noise pair: 1.0
+     + event-event (same event id) pair: 1.0
+     + event-event (different event id) pair: 0.5
+     + event-noise pair: 0.1
+     
+     *Result* With the advanced weights the network has no false
+     positives and false negatives in test timeslices which contained
+     event nodes. However, in slice 0 (no event hits) it thought
+     everything was a event hit (ie. all predicted labels were false
+     positives).
+
+     The model thus is biased by the presence of the high weight on the
+     edge of noise-noise pairs since a similar weight exists between
+     event-event (same event id) pairs as well. So, the model is unable
+     to learn anything meaningful from the node features.
+
+     *Next* Assign a low weight to noise-noise pairs.
+
+     *next* put no weights on noise-noise pairs
+    
+**** [exp,gcd] low weights for noise-noise edges
+     *Motivation* high false positives in model trained with advanced
+     weights when tested with timeslice with no event nodes.
+
+     *Hypothesis* model classifies noise nodes in timeslice with no
+     event nodes as well.
+
+     *Result* This results in a no skill classifier. This makes sense
+     because we also assign a low weight of 0.1 to noise-event pairs.
+     Now with noise-noise pairs with the same edge weights, the model is
+     no longer able to identify the noise nodes properly.
+
+     The expectation was that the model learns something from the node
+     features but this does not seem to be the case.
+
+     *Next* Any further improvements to the model is beyond the scope of
+      this project. Propose all the improvements and alternative paths
+      of research in the report. This concludes the experimentation and
+      practical side of the thesis!
 *** CANCELLED Vector edge features
     :LOGBOOK:
     - State "CANCELLED"  from              [2020-09-14 Mon 21:07]
@@ -369,7 +416,14 @@
     
 ** Future Work
    Several alternative paths of research are touched upon in this section.
+*** evaluate entire pipeline
+    Evaluate the entire pipeline using the best performing models with
+    various timeslices and observe how well the pipeline is able to
+    identify timeslices worth saving.
 
+    Since this requires modifying the PM model to perform multi-label
+    classification, suggest this as future work.
+    
 *** Limited testing and experimentation
     Due to pytorch being built from source and the viltstift not
     having Nvidia GPUs, pytorch geometric could not be installed as it
@@ -409,24 +463,6 @@
 
     Edges can instead be given a weight based on the type of edge,
     with the hopes that it helps the network classify the nodes better.
-
-* Pipeline
-  This section describes the experimentation and evaluation of the
-  entire data processing pipeline.
-
-** Approach
-   The best model from the two previous steps namely "Pattern Matrix"
-   and "Graph Community Detection" were used to construct the pipeline
-   which given a timeslice can predict if it should be saved or not
-   saved based on the presence of hits from neutrino events.
-
-** TODO Data Preparation
-
-** TODO Evaluation
-
-** TODO Experiments
-
-** TODO Future Work
 
 * References
 + [goodfellow2016deep] :: Goodfellow, I., Bengio, Y., Courville, A., &
