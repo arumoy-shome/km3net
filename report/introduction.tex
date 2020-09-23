@@ -5,9 +5,6 @@
 %: ----------------------- introduction file header -----------------------
 \chapter{Introduction}
 
-% the code below specifies where the figures are stored
-\graphicspath{{./1-introduction/figures/}}
-
 % ----------------------------------------------------------------------
 %: ----------------------- introduction content ----------------------- 
 % ----------------------------------------------------------------------
@@ -92,6 +89,11 @@ pipeline which utilizes correlation and graph community detection to identify
 time slices that may contain neutrino hits whilst \cite{post2019km3nnet}
 suggests an alternate using convolutional neural networks.
 
+\todo{here is an alternative to introduce related work chapter}
+Next chapter discusses the existing body of work on the matter.
+Emphasis is put on the work done by \citeauthor{karas2019data} since
+this project seeks to directly improve upon their work.
+
 \subsection{User Requirements}\label{user-requirements}
 
 The primary users of the ARCA are researchers who want to study high energy
@@ -113,24 +115,40 @@ improve upon it's predecessor's performance else provide a good trade off with
 data quality.
 
 \section{Research Question}
-
+\todo{this section needs more work, iterate as and when possible}
 This report intends to improve upon the GPU pipeline proposed by
-\cite{karas2019data}, specifically we wish to answer the following research
-questions:
+\cite{karas2019data}, specifically this project wishes to answer the
+following research questions:
 
 \begin{enumerate}
   \item[\textbf{RQ1}.] \textbf{Can the existing GPU pipeline be improved using neural networks (NNs)?}
 
-    Specifically, improvement may be achieved by reducing the processing time
-    of the pipeline or improving the accuracy of identifying important
-    timeslices. In order to answer this research question, the following sub
-    questions are formulated.
+    Improvement may be achieved by reducing the processing time of the
+    pipeline or improving the accuracy of identifying important
+    timeslices. This project focuses on achieving improvement via
+    accuracy. The task of validating the runtime performance of the
+    methods proposed in this paper is left to a separate project.
 
-  \item[\textbf{RQ2.}] \textbf{Which NN will produce the best results when replaced with the \emph{Pattern Matrix}?}
+    In order to answer \textbf{RQ1}, the following sub questions are
+    formulated.
 
-    TODO add rational
+  \item[\textbf{RQ2.}] \textbf{Can the \emph{Pattern Matrix Criterion} be replaced with a Multi Layer Perceptron?}
 
-  \item[\textbf{RQ3.}] \textbf{Which NN will produce the best results when replaced with the \emph{Graph Community Detection} algorithm?}
+    \citeauthor{karas2019data} proposed a novel trigger criterion
+    which given a pair of points, can quantify the level of
+    correlation amongst the points with an accuracy of 80\%. The first
+    phase of this project focuses on achieving better accuracy to
+    identify ``causally related'' points using a Multi Layer
+    Perceptron (henceforth referred to as MLP).
 
-    TODO add rational
+  \item[\textbf{RQ3.}] \textbf{Can the \emph{Graph Community Detection} step be replaced with a Graph Convolusional Neural Network?}
+
+    The output of the Pattern Matrix Criterion is fed into the
+    Constant Pots clustering algorithm. The algorithm operates on the
+    principles of Graph Community Detection and groups the input into
+    communities of events hits and noise hits. The second phase of
+    this project focuses on achieving a better accuracy for
+    identifying event hits in a given timeslice using Graph
+    Convolusional Neural Networks (henceforth referred to as GCN).
+    
 \end{enumerate}
