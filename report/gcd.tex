@@ -1,0 +1,49 @@
+% this file is called up by thesis.tex
+% content in this file will be fed into the main document
+
+\chapter{Replacement for Graph Community Detection Step} % top level followed by section, subsection
+\label{cha:gcd}
+% ----------------------- contents from here ------------------------
+% 
+
+This chapter presents the replacement created using a Graph
+Convolusional Neural Network (GCN) for the \emph{Graph Community Detection
+Step} of the Karas pipeline (see \ref{sec:karas-pipeline}). It is
+observed that a GCN is able to classify noise and event nodes very
+well, even in extremely skewed datasets with less than 10 event nodes.
+The chapter begins with an overview of GCNs and how they have been
+applied to this problem. The data preparation, visualization and model
+evaluation are touched upon next. The chapter concludes with
+discussion of the results and next steps.
+
+\section{Primer on Graph Convolusional Neural Networks}
+\label{sec:gcn-primer}
+
+- GCNs operate on graph like data structures
+- message passing and aggregation -> node embedding updates
+- 
+GCNs have several applications however we use it for classification of nodes.
+\section{Data Preparation}
+\label{sec:gcd-data-prep}
+
+\subsection{Preparation of Training Data}
+\label{sec:gcd-data-prep-train}
+
+\subsection{Preparation of Testing Data}
+\label{sec:gcd-data-prep-test}
+
+\section{Data Exploration and Visualization}
+\label{sec:gcd-data-exp}
+
+\section{Model Description}
+\label{sec:gcd-model-desc}
+
+\section{Model Evaluation}
+\label{sec:gcd-model-eval}
+
+\section{Discussion}
+\label{sec[gcd-disc]}
+
+% ---------------------------------------------------------------------------
+% ----------------------- end of thesis sub-document ------------------------
+% ---------------------------------------------------------------------------
