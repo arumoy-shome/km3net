@@ -6,6 +6,11 @@
   - [2020-08-21 Fri 13:47] [[https://arxiv.org/abs/1206.5533][paper]] on practical recommendations for common
   hyper parameters for gradient descent based models
 
+** [paper] recommendations to improve model
+   This [[https://arxiv.org/abs/1206.5533][paper]] will be useful to cite as source for the
+   recommendations I make on improving the km3net models. For a high
+   level overview, consult Chapter 1: Introduction of the Better Deep
+   Learning book.
 * Pattern Matrix
   In this section strategies are explored to replace the /Hit
   Correlation/ step of the existing data processing pipeline.
