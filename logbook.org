@@ -310,7 +310,7 @@
    label column.
 
    Note that pytorch geometric requires that =num_edges= be of length
-   $n^{2} - n$. To facilitate this, =km3net.data.model.process()=
+   =n^{2} - n=. To facilitate this, =km3net.data.model.process()=
    accepts a =model= parameter which should be set to 'gcd'.
    
 ** Evaluation

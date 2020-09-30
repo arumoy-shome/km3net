@@ -30,7 +30,7 @@ difference between the given points. Since this phenomenon is
 consistent across the entire dataset, training using a sample does not
 introduce any bias into the model.
 
-% TODO find the mathematical term for the series
+% TODO find the mathematical term for the series, could be n^{2}-n!
 Figure \ref{fig:pm-dataset} summarizes the pattern matrix dataset
 creation process. With an input data of shape \texttt{(n, 4)}
 (\texttt{n} rows and 4 columns representing the \texttt{x, y, z, and
@@ -100,6 +100,8 @@ very few related hits, thus the performance of the model on test set
 \section{Data Exploration and Visualization}
 
 \section{Model Description}
+\label{sec:pm-mpdel-desc}
+
 The expectation of the model is to identify if two given points are
 causally related to each other or not. As revealed through data
 exploration in Chapter \ref{cha:data-exploration}, hits originating from
@@ -107,6 +109,7 @@ neutrino events occur close to each other in space and time. Thus, The
 expectation from the model is to learn this phenomenon by training
 over pairs of points and classify unseen data as related or unrelated.
 
+% TODO add table to summarize the model params
 Being a binary classification task, the \textit{Binary Cross Entropy
   Loss (BCELoss)} was selected as the loss function since it has been
 established as the standard loss function for binary classification

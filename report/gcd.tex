@@ -19,27 +19,137 @@ discussion of the results and next steps.
 \section{Primer on Graph Convolusional Neural Networks}
 \label{sec:gcn-primer}
 
-- GCNs operate on graph like data structures
-- message passing and aggregation -> node embedding updates
-- 
-GCNs have several applications however we use it for classification of nodes.
+\subsection{GNN and graphs}
+
+% TODO mathematical depiction of graphs
+GNNs are designed to operate on data which can be represented as
+graphs. A graph consists of nodes and edges. Each node may or may not
+be connected to one or many nodes, these are referred to as the
+neighbors of the node. A graph with all nodes connected to one another
+is called a fully connected graph.
+
+An edge may attributes associated with it, the two most common
+attributes being weight and direction. An edge may be directed which
+denotes a sense of hierarchy amongst the nodes, or undirected. An edge
+may also have a weight to signify a stronger or weaker connection
+amongst nodes.
+
+Graphs are primarily classified into two variants.
+
+\begin{enumerate}
+\item \textbf{Homogeneous graphs}. Graphs with the same type of nodes
+  and edges are referred to as homogeneous graphs. For example, a
+  graph representing who follows who on Twitter is a homogeneous
+  graph. Here, people are represented as nodes and an edge indicates
+  that person A follows person B.
+\item \textbf{Heterogeneous graphs}. Graphs with different types of
+  nodes and edges are referred to as heterogeneous graphs. For
+  example, a graph representing a person's likes and dislikes in
+  regards to food items. Here, two entities, namely people and food
+  are represented as nodes. The edges also come in two variants ie. a
+  'like' and a 'dislike'.
+\end{enumerate}
+% TODO illustrate types of graphs and their attributes
+
+\subsection{The Message Passing Paradigm}
+
+% TODO illustrate the paradigm
+% TODO introduce mathematically?
+During each training epoch, a node propagates it's embedding to it's
+neighbors and in return receives their embedding. All collected
+embeddings are aggregated (for example using a sum, difference or
+mean) which becomes the new embedding of the node. This procedure is
+done for all nodes of the graph, for each training epoch. The number
+of layers in the network determine how far the messages are sent. For
+example, for a network with a single layer, each node sends a message
+to it's immediate neighbors. With 2 layers, the node also sends a
+message to the neighbors of it's immediate neighbors and so forth.
+
+\subsection{GNN and it's Variants}
+
+GNNs have two primary applications.
+
+\begin{enumerate}
+\item \textbf{Node classification}. This is a semi-supervised learning
+  setting (although it can also be used in a supervised setting).
+  Given a graph with nodes associated with a label, the network can be
+  used to predict the label of unseen nodes.
+\item \textbf{Graph classification}. In this approach, the network is
+  trained using several graphs each associated with a label. The
+  network can then be used to predict the label of an unseen graph.
+\end{enumerate}
+
+
 \section{Data Preparation}
 \label{sec:gcd-data-prep}
+
+% TODO illustrate data prep procedure
+The graphs for the testing and training of the network are constructed
+from a combination of the main dataset and a modified version of the
+pattern matrix dataset.
+
+The node embeddings and it's labels are derived from the main dataset.
+Each node is thus assigned a \texttt{(x,y,z,t)} vector as it's node
+embedding. The node is assigned a label of 1 if it is an event hit,
+else a label of 0.
+
+A modified pattern matrix dataset (see \ref{sec:pm-data-prep}) with a
+shape of \texttt{(n^{2}-n, 5)} is created such that each hit is paired
+with all other hits except itself. The label column from this dataset
+is then used as the edge weights of the graph. Edges between event
+nodes from the same event thus are assigned a weight of 1 and all
+other edges are assigned a weight of 0.
 
 \subsection{Preparation of Training Data}
 \label{sec:gcd-data-prep-train}
 
+Since the main dataset and the pattern matrix dataset are highly
+skewed, naturally the gcd dataset is also skewed with majority of the
+nodes being noise. Similar strategy as used in the creation of the
+pattern matrix training set (see \ref{sec:pm-data-prep-train}) is
+used. The training set is a graph with 1000 nodes equally distributed
+amongst the classes.
+
 \subsection{Preparation of Testing Data}
 \label{sec:gcd-data-prep-test}
+
+The skewed nature of the data is maintained in the testing set. The
+model is evaluated with 3 test sets each with varying levels of
+examples of event nodes. In practise, the pipeline will observe
+timeslices with no to very few events thus the performance of the
+model on test set 1 and 2 should be given importance.
+
+\begin{enumerate}
+\item Test set with no event nodes
+\item Test set with less than 25 event nodes
+\item Test set with less than 250 event nodes
+\end{enumerate}
 
 \section{Data Exploration and Visualization}
 \label{sec:gcd-data-exp}
 
-\section{Model Description}
-\label{sec:gcd-model-desc}
+\section{Model Description and Evaluation}
+\label{sec:gcd-model-desc-eval}
 
-\section{Model Evaluation}
-\label{sec:gcd-model-eval}
+The model is expected to classify nodes of an unseen graph as event or
+noise nodes. Since causally related nodes are connected with edges
+carrying a high weight, the model is expected to group them together
+thus resulting in a final graph with small clusters of causally
+related nodes and a large number of unclustered noise nodes.
+
+The parameters of the model are summarized in Table
+\ref{tab:gcd-model-param}, the rational for selecting the parameters
+being the same as that of the pattern matrix model (see
+\ref{sec:pm-model-desc}) since both models perform binary
+classification. The difference comes from the model architecture. The
+GCD model comprises of an input layer, two hidden layers and an output
+layer. The network is fully connected with 4 neurons in the input
+layer, 16 in both hidden layers and 1 neuron in the output layer.
+
+Evaluation metrics used for evaluating the pattern matrix model are
+used to evaluate the GCD model as well (see Section
+\ref{sec:pm-model-eval}) since the GCD dataset is also highly skewed
+in nature.
 
 \section{Discussion}
 \label{sec[gcd-disc]}
