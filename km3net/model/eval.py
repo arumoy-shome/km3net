@@ -2,9 +2,10 @@ import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.metrics as skmetrics
+from km3net.utils import ROOTDIR
 
 def confusion_matrix(cm, classes, normalize=False, title='Confusion Matrix',
-        cmap=plt.cm.Blues):
+        cmap=plt.cm.Blues, save=None):
     """
 In
 --
@@ -36,11 +37,13 @@ cmap -> matplotlib.plt.cm, color map to use for the plot
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.figure(figsize=(8,8))
+
+    if save:
+        plt.savefig(save, dpi=200)
 
     return plt
 
-def learning_curve(train_losses, valid_losses):
+def learning_curve(train_losses, valid_losses, save=None):
     """
 In
 --
@@ -59,11 +62,12 @@ plt -> matplotlib.pyplot, line plot containing the training and validation losse
 
     plt.ylabel('Loss')
     plt.xlabel('Epochs')
-    plt.figure(figsize=(8,8))
 
+    if save:
+        plt.savefig(save, dpi=200)
     return plt
 
-def roc_curve(y_true, y_score):
+def roc_curve(y_true, y_score, save=None):
     """
     In
     --
@@ -84,13 +88,15 @@ def roc_curve(y_true, y_score):
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.legend()
-    plt.figure(figsize=(8,8))
 
     auc = skmetrics.roc_auc_score(y_true, y_score)
 
+    if save:
+        plt.savefig(save, dpi=200)
+
     return auc, plt
 
-def precision_recall_curve(y_true, y_score):
+def precision_recall_curve(y_true, y_score, save=None):
     """
     In
     --
@@ -110,9 +116,11 @@ def precision_recall_curve(y_true, y_score):
     plt.xlabel('Recall')
     plt.ylabel('Precision')
     plt.legend()
-    plt.figure(figsize=(8,8))
 
     auc = skmetrics.auc(recall, precision)
+
+    if save:
+        plt.savefig(save, dpi=200)
 
     return auc, plt
 
