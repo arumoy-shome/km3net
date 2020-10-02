@@ -21,7 +21,7 @@ def train(loader, model, criterion, optimizer, device):
         optimizer.zero_grad()
         yhat = model(inputs)
         yhat = yhat.squeeze() # (batch_size, 1) -> (batch_size,) to match targets.shape
-        loss = criterion(yhat, targets)
+        loss = criterion(yhat, targets.squeeze())
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
@@ -46,7 +46,7 @@ def valid(loader, model, criterion, device):
         inputs, targets = inputs.to(device), targets.to(device)
         yhat = model(inputs)
         yhat = yhat.squeeze()
-        loss = criterion(yhat, targets)
+        loss = criterion(yhat, targets.squeeze())
         running_loss += loss.item()
 
     return running_loss / len(loader.dataset)
@@ -78,7 +78,7 @@ def test(loader, model, device):
         yhat = model(inputs)
         yhat = yhat.squeeze()
         yhat_label = yhat.round()
-        y_true = torch.cat((y_true, targets), 0)
+        y_true = torch.cat((y_true, targets.squeeze()), 0)
         y_pred = torch.cat((y_pred, yhat_label), 0)
         y_score = torch.cat((y_score, yhat), 0)
 

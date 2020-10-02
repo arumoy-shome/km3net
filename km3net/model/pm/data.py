@@ -16,6 +16,7 @@ class MLPDataset(Dataset):
         dataset -> torch.utils.data.Dataset, object
         """
         self.X = X
+        self.y = y
         self.X = self.X.astype('float32')
         self.y = self.y.astype('float32')
         if scale:
@@ -42,7 +43,7 @@ class MLPDataset(Dataset):
 
         return random_split(self, [train_size, test_size])
 
-def prepare_train_data(path, scale=True, n_test=0.33):
+def prepare_train_data(X, y, scale=True, n_test=0.33):
     """
     In
     --
@@ -57,7 +58,7 @@ def prepare_train_data(path, scale=True, n_test=0.33):
     ---
     train_dl, test_dl -> Tuple, contains the train and test DataLoader iterables
     """
-    dataset = MLPDataset(path, scale=scale)
+    dataset = MLPDataset(X, y, scale=scale)
     train, test = dataset.get_splits(n_test)
 
     train_dl = DataLoader(train, batch_size=16, shuffle=True)
@@ -65,7 +66,7 @@ def prepare_train_data(path, scale=True, n_test=0.33):
 
     return train_dl, test_dl
 
-def prepare_test_data(path, scale=True):
+def prepare_test_data(X, y, scale=True):
     """
     In
     --
@@ -80,7 +81,7 @@ def prepare_test_data(path, scale=True):
     ---
     test_dl -> test DataLoader iterable
     """
-    dataset = MLPDataset(path, scale=scale)
+    dataset = MLPDataset(X, y, scale=scale)
     _, test = dataset.get_splits(n_test=1.0)
     test_dl = DataLoader(test, batch_size=32, shuffle=False)
 
