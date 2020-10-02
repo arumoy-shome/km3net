@@ -177,8 +177,8 @@ alternatives are also considered for the evaluation of the model.
 \item \textbf{Receiver Operating Characteristic (ROC) curve} is a plot
   of the false positive rate and the false negative rate across
   various probability thresholds. The area under the ROC curve (ROC
-  AUC) is also considered.
-\item \textbf{Precision-Recall (PR) Curve} can be considered a better
+  ARC) is also considered.
+\item \textbf{Precision-Recall (CPR) Curve} can be considered a better
   alternative to the ROC curve since the ROC curve can be overly
   optimistic of the model's skill for skewed data. The Area under the
   PR curve (PR AUC) is also considered.
@@ -189,6 +189,48 @@ alternatives are also considered for the evaluation of the model.
 
 \section{Discussion}
 \label{sec:pm-disc}
+% low related hits:
+% ROC AUC: 0.999
+% ROC PR: 0.001
+%%               precision    recall  f1-score   support
+
+%%          0.0       1.00      0.91      0.96   5829395
+%%          1.0       0.00      1.00      0.00        10
+
+%%     accuracy                           0.91   5829405
+%%    macro avg       0.50      0.96      0.48   5829405
+%% weighted avg       1.00      0.91      0.96   5829405
+%% F1: 0.0
+%% F2: 0.0
+
+%% medium related hits:
+% ROC AUC: 0.978
+% ROC PR: 0.009
+%%               precision    recall  f1-score   support
+
+%%          0.0       1.00      0.92      0.96   5879559
+%%          1.0       0.00      0.98      0.00      1176
+
+%%     accuracy                           0.92   5880735
+%%    macro avg       0.50      0.95      0.48   5880735
+%% weighted avg       1.00      0.92      0.96   5880735
+%% F1: 0.005
+%% F2: 0.011
+
+%% high related hits:
+% ROC AUC: 0.959
+% ROC PR: 0.334
+%%               precision    recall  f1-score   support
+
+%%          0.0       1.00      0.92      0.96    355859
+%%          1.0       0.19      0.83      0.31      8372
+
+%%     accuracy                           0.92    364231
+%%    macro avg       0.59      0.87      0.63    364231
+%% weighted avg       0.98      0.92      0.94    364231
+%% F1: 0.311
+%% F2: 0.497
+
 % TODO discussion of results of best model
 
 % ---------------------------------------------------------------------------
