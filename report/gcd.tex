@@ -94,7 +94,7 @@ embedding. The node is assigned a label of 1 if it is an event hit,
 else a label of 0.
 
 A modified pattern matrix dataset (see \ref{sec:pm-data-prep}) with a
-shape of \texttt{(n^{2}-n, 5)} is created such that each hit is paired
+shape of \texttt{$(n^{2}-n, 5)$} is created such that each hit is paired
 with all other hits except itself. The label column from this dataset
 is then used as the edge weights of the graph. Edges between event
 nodes from the same event thus are assigned a weight of 1 and all

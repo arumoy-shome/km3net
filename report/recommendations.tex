@@ -1,0 +1,76 @@
+% this file is called up by thesis.tex
+% content in this file will be fed into the main document
+
+\chapter{Recommendations} % top level followed by section, subsection
+
+% ----------------------- contents from here ------------------------
+% 
+
+This chapter presents some practical recommendations for the readers
+who wish to use the new data processing pipeline presented in this
+report. The chapter also presents alternative paths of research which
+remain unexplored and general improvements that can be made to the
+pipeline in the future.
+
+Chapter \ref{cha:pm} presented a Multi Layered Perceptron capable of
+identifying causally related hits with a higher accuracy, precision
+and recall compared to the Pattern Matrix Criterion presented by
+\citeauthor{karas2019data}. The PM model is seem as a viable successor
+to the PM Criterion. The model can be further improved using larger
+training sets and the model performance can be improved by utilizing
+the plethora of techniques.
+% TODO what techniques? Name a few relevant ones.
+
+The output of the MLP is observed to be primitive (see Section
+\ref{sec:pm-model-disc}). As proved empirically, the GCD model is able
+to perform better when the edge weights are assigned based on the type
+of connection between the nodes (see Section
+\ref{sec:gcd-adv-weights}). In order to obtain the advanced edge
+weight scheme, the MLP must be modified such that it performs
+multi-class classification on the edge types. For a classification
+problem of n edge types, the output of the MLP will thus become a
+\texttt{(n,)} vector containing the expected probability for each
+class. These probabilities can then be used as the edge weights.
+% TODO illustrate this
+
+Chapter \ref{cha:gcd} presented a Graph Convolusional Neural Network
+capable of identifying event nodes with immaculate accuracy, precision
+and recall in extremely skewed datasets. The network however have a
+very high false positive rate when tested with a set containing no
+event nodes. This bias may be removed by framing the data as a
+multi-edge, heterogeneous graph. The model is thrown off by the high
+weights on edges between causally related event nodes and noise nodes.
+Thus by creating different types of edges corresponding to the various
+types of connections that two nodes may posses (see
+\ref{sec:gcd-adv-weights}), each carrying the corresponding weights,
+the network may be able to correct it's bias to the positive class.
+% TODO illustrate this
+
+The models presented in this report were testing in isolation. However
+the intended use is to combine them in order to identify timeslices
+containing neutrino event hits (see Section \ref{sec:shomw-pipeline}).
+Thus the models should be tested as an integrated pipeline in order to
+determine if feasible as improvement over the Karas pipeline.
+
+Results from the GCD experiments (see Section
+\ref{sec:gcd-model-disc}) indicate that the model is unable to learn
+anything from the node embeddings thus identifying better node
+embeddings to help the enhance the model's learning abilities remains
+open to be examined. The network currently aggregates the node
+embeddings by adding them. This however may not be an apt aggregation
+function and the model's performance needs to be compared with
+alternatives such as the difference and mean.
+
+An alternative path of research exists to explore the possibility of
+replacing the entire pipeline with a single GNN. The data can be
+framed such that the \texttt{(x, y, z)} vector is used as the node
+embedding and \texttt{$\delta t$} between the nodes is used as the
+edge feature.
+
+Finally, the problem can also
+be framed as a graph classification problem. The expectation being
+that the network is able to identify clusters of causally related
+nodes from noise.
+% ---------------------------------------------------------------------------
+% ----------------------- end of thesis sub-document ------------------------
+% ---------------------------------------------------------------------------
