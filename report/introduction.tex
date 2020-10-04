@@ -22,7 +22,7 @@
 The KM3NeT or the Cubic Kilometer Neutrino Telescope is currently being
 constructed at the bottom of the Mediterranean Sea. The goal of this telescope
 is two fold: first is to study high energy neutrinos originating from celestial
-events such as birth of a neutrino star, supernovae, etc. and second, to study
+events such as birth of a neutrino star or a supernova. And second, to study
 the properties of the neutrino particles produced in the Earth's atmosphere
 \cite{adrian2016letter}. The first goal will be realized with the KM3NeT/ARCA
 (Astroparticle Research with Cosmics in the Abyss) telescope and the second
@@ -37,23 +37,22 @@ with KM3NeT/ORCA (Oscillation Research with Cosmics in the Abyss)
 \end{figure}
 
 The ARCA telescope comprises of two ``blocks'' with a total volume of
-$1km^{3}$. Each block consists of 115 spherical detector units (referred to as
-DOMs henceforth) and each DOM consists of 31 Photo Multiplier Tubes (PMTs) in
-various spacial arrangement. Figure \ref{fig:blocks} shows an artist's
-impression of ARCA, figure \ref{fig:doms} depicts a DOM along with the PMTs
-inside it.
+$1km^{3}$. Each block consists of 115 spherical detector units (DOMs)
+and each DOM consists of 31 Photo Multiplier Tubes (PMTs) in various
+spacial arrangement. Figure \ref{fig:blocks} shows an artist's
+impression of ARCA, figure \ref{fig:doms} depicts a DOM along with the
+PMTs inside it.
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.5\textwidth]{doms.png}
+\begin{wrapfigure}{l}{0.5\textwidth}
+  \includegraphics[width=0.9\linewidth]{doms.png}
   \caption{An optical detector (DOM) \textit{source: https://www.km3net.org}}%
   \label{fig:doms}
-\end{figure}
+\end{wrapfigure}
 
 The PMTs are sensitive to light or photons, the analog signal for all hits
 above a certain threshold are digitized. This datapoint consists of a timestamp
 and the spatial orientation of the DOM (ie. x,y,z coordinates). The digital
-signals from all PMTs are arranged in 100ms ``time slices'' and sent to the
+signals from all PMTs are arranged in 100ms ``timeslices'' and sent to the
 on-shore facility for further processing \cite{aiello2019km3net}.
 
 \section{Situation of Concern}
@@ -102,23 +101,34 @@ in the project and by extension all scientists from these institutes who will
 be working with the data collected.
 
 The requirements of the primary users (and stakeholders) with respect to the
-data acquisition pipeline are as follows: 1. The accuracy with which time
-slices are filtered out has to be extremely high. Time slices which are deemed
-important by event trigger algorithms are stored for further analysis and
-research. Failure to store time slices containing important data can lead to
-loss of important data and thus a poor quality of research. 2. The filtration
-of noise must be highly accurate. The event trigger algorithms must be able to
-eliminate majority of noise to prevent storage of unnecessary and potentially
-useless data. 3. The state of the art event trigger algorithms are able to
-process data in real time. The proposed alternative ideally should maintain or
-improve upon it's predecessor's performance else provide a good trade off with
-data quality.
+data acquisition pipeline are as follows.
+
+\begin{enumerate}
+  \item[\textbf{UR1}.]\textbf{The accuracy of filtration must be extremely high.}
+
+    Time slices which are deemed important by event trigger algorithms
+    are stored for further analysis and research. Failure to store
+    time slices containing information from neutrino events can lead
+    to loss of important data and thus a poor quality of research. On
+    the other hand, since majority of the data generated is noise, the
+    pipeline must be able to eliminate majority of noise to prevent
+    storage of unnecessary and potentially useless data.
+
+  \item[\textbf{UR2}.] \textbf{Filtration should occur in real time.}
+
+    The state of the art event trigger algorithms are able to process
+    data in real time. The proposed alternative ideally should
+    maintain or improve upon it's predecessor's performance else
+    provide a good trade off with data quality.
+
+\end{enumerate}
 
 \section{Research Question}
 % TODO this section needs more work, iterate as and when possible
 This report intends to improve upon the GPU pipeline proposed by
-\cite{karas2019data}, specifically this project wishes to answer the
-following research questions:
+\citeauthor{karas2019data}, an overview for which is presented in
+Chapter \ref{cha:karas-pipeline}. Specifically this project wishes to
+answer the following research questions.
 
 \begin{enumerate}
   \item[\textbf{RQ1}.] \textbf{Can the existing GPU pipeline be improved using neural networks (NNs)?}
@@ -139,16 +149,20 @@ following research questions:
     correlation amongst the points with an accuracy of 80\%. The first
     phase of this project focuses on achieving better accuracy to
     identify ``causally related'' points using a Multi Layer
-    Perceptron (henceforth referred to as MLP).
-
+    Perceptron (MLP).
+    % TODO introduce causally related points before reference here
+    
   \item[\textbf{RQ3.}] \textbf{Can the \emph{Graph Community Detection} step be replaced with a Graph Convolusional Neural Network?}
 
-    The output of the Pattern Matrix Criterion is fed into the
-    Constant Pots clustering algorithm. The algorithm operates on the
-    principles of Graph Community Detection and groups the input into
-    communities of events hits and noise hits. The second phase of
-    this project focuses on achieving a better accuracy for
-    identifying event hits in a given timeslice using Graph
-    Convolusional Neural Networks (henceforth referred to as GCN).
+    The output of the Pattern Matrix Criterion is used to create a
+    graph structure where hits (of events and noise) are represented
+    as nodes and causally related nodes are connected with an
+    undirected edge carrying the probability of correlation as its
+    weight. The Constant Pots clustering algorithm \cite{CITEME},
+    which operates on the principles of Graph Community Detection, is
+    used to separate the graph into communities of event and noise
+    hits. The second phase of this project focuses on achieving a
+    better accuracy for identifying event hits in a given timeslice
+    using Graph Convolusional Neural Networks (GCNs).
     
 \end{enumerate}
