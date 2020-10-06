@@ -28,11 +28,17 @@ be connected to one or many nodes, these are referred to as the
 neighbors of the node. A graph with all nodes connected to one another
 is called a fully connected graph.
 
-An edge may attributes associated with it, the two most common
+An edge may have attributes associated with it, the two most common
 attributes being weight and direction. An edge may be directed which
 denotes a sense of hierarchy amongst the nodes, or undirected. An edge
 may also have a weight to signify a stronger or weaker connection
 amongst nodes.
+
+Nodes may also posses attributes associated with themselves, commonly
+known as node embeddings. The complexity of the node embedding may
+range from a simple scalar quantity to a multi-dimensional tensor,
+and depends on the dataset and how the practitioner wishes to sculpt
+the graph.
 
 Graphs are primarily classified into two variants.
 
@@ -65,53 +71,60 @@ example, for a network with a single layer, each node sends a message
 to it's immediate neighbors. With 2 layers, the node also sends a
 message to the neighbors of it's immediate neighbors and so forth.
 
-\subsection{GNN and it's Variants}
+%% \subsection{GNN and it's Variants}
 
-GNNs have two primary applications.
+%% GNNs have two primary applications.
 
-\begin{enumerate}
-\item \textbf{Node classification}. This is a semi-supervised learning
-  setting (although it can also be used in a supervised setting).
-  Given a graph with nodes associated with a label, the network can be
-  used to predict the label of unseen nodes.
-\item \textbf{Graph classification}. In this approach, the network is
-  trained using several graphs each associated with a label. The
-  network can then be used to predict the label of an unseen graph.
-\end{enumerate}
+%% \begin{enumerate}
+%% \item \textbf{Node classification}. This is a semi-supervised learning
+%%   setting (although it can also be used in a supervised setting).
+%%   Given a graph with nodes associated with a label, the network can be
+%%   used to predict the label of unseen nodes.
+%% \item \textbf{Graph classification}. In this approach, the network is
+%%   trained using several graphs each associated with a label. The
+%%   network can then be used to predict the label of an unseen graph.
+%% \end{enumerate}
 
 
 \section{Data Preparation}
-\label{sec:gcd-data-prep}
+\label{sec:gcn-data-prep}
 
 % TODO illustrate data prep procedure
 The graphs for the testing and training of the network are constructed
 from a combination of the main dataset and a modified version of the
-pattern matrix dataset.
+MLP dataset, Figure \ref{fig:gcn-data} illustrates this procedure. A
+fully connected graph is constructed, and its node embeddings and node
+labels are derived from the main dataset. Thus, each node is thus
+assigned a $(x,y,z,t)$ vector as it's node embedding. The node is
+assigned a label of 1 if it is an event hit, else a label of 0.
 
-The node embeddings and it's labels are derived from the main dataset.
-Each node is thus assigned a \texttt{(x,y,z,t)} vector as it's node
-embedding. The node is assigned a label of 1 if it is an event hit,
-else a label of 0.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{gcn-data.jpg}
+  \caption{Overview of GCN dataset creation procedure. \textbf{(1)} an
+    example of the main dataset with 5 hits. \textbf{(2)} the
+    corresponding modified MLP dataset created. Although the dataset
+    will contain $n^{2}-n = 25$ rows, only the unique rows (10 in this
+    example) are shown in the illustration for simplicity.
+    \textbf{(3)} The graph representation is created where rows of (1)
+    become the node embeddings and the label column of (2) become the
+    edge weights.}
+  \label{fig:gcn-data}
+\end{figure}
 
-A modified pattern matrix dataset (see \ref{sec:pm-data-prep}) with a
-shape of \texttt{$(n^{2}-n, 5)$} is created such that each hit is paired
-with all other hits except itself. The label column from this dataset
-is then used as the edge weights of the graph. Edges between event
-nodes from the same event thus are assigned a weight of 1 and all
-other edges are assigned a weight of 0.
-
-\subsection{Preparation of Training Data}
-\label{sec:gcd-data-prep-train}
+A modified MLP dataset (see \ref{sec:mlp-data-prep}) with a shape of
+\texttt{$(n^{2}-n, 5)$} is created such that each hit is paired with
+all other hits except itself. The label column from this dataset is
+then used as the edge weights of the graph. Edges between event nodes
+from the same event thus are assigned a weight of 1 and all other
+edges are assigned a weight of 0.
 
 Since the main dataset and the pattern matrix dataset are highly
-skewed, naturally the gcd dataset is also skewed with majority of the
+skewed, naturally the GCN dataset is also skewed with majority of the
 nodes being noise. Similar strategy as used in the creation of the
-pattern matrix training set (see \ref{sec:pm-data-prep-train}) is
+pattern matrix training set (see \ref{sec:mlp-data-prep}) is
 used. The training set is a graph with 1000 nodes equally distributed
 amongst the classes.
-
-\subsection{Preparation of Testing Data}
-\label{sec:gcd-data-prep-test}
 
 The skewed nature of the data is maintained in the testing set. The
 model is evaluated with 3 test sets each with varying levels of
@@ -120,36 +133,47 @@ timeslices with no to very few events thus the performance of the
 model on test set 1 and 2 should be given importance.
 
 \begin{enumerate}
-\item Test set with no event nodes
-\item Test set with less than 25 event nodes
-\item Test set with less than 250 event nodes
+\item[\textbf{TS1}.] No event nodes
+\item[\textbf{TS2}.] Less than 25 event nodes
+\item[\textbf{TS3}.] Less than 250 event nodes
 \end{enumerate}
 
-\section{Data Exploration and Visualization}
-\label{sec:gcd-data-exp}
-
 \section{Model Description and Evaluation}
-\label{sec:gcd-model-desc-eval}
+\label{sec:gcn-model-desc-eval}
 
 The model is expected to classify nodes of an unseen graph as event or
 noise nodes. Since causally related nodes are connected with edges
 carrying a high weight, the model is expected to group them together
 thus resulting in a final graph with small clusters of causally
-related nodes and a large number of unclustered noise nodes.
+related nodes and a large clusters of noise nodes.
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{rr}
+    \hline
+    Loss & BCELoss \\
+    Optimizer & Adam with learning rate of $0.001$ \\
+    Hidden Activation & ReLu \\
+    Output Activation & Sigmoid \\
+    \hline
+  \end{tabular}
+  \caption{GCN Model Parameter Summary.}
+  \label{tab:gcn-model-param}
+\end{table}
 
 The parameters of the model are summarized in Table
-\ref{tab:gcd-model-param}, the rational for selecting the parameters
+\ref{tab:gcn-model-param}, the rational for selecting the parameters
 being the same as that of the pattern matrix model (see
-\ref{sec:pm-model-desc}) since both models perform binary
+\ref{sec:mlp-model-desc}) since both models perform binary
 classification. The difference comes from the model architecture. The
-GCD model comprises of an input layer, two hidden layers and an output
-layer. The network is fully connected with 4 neurons in the input
-layer, 16 in both hidden layers and 1 neuron in the output layer.
+GCN model comprises of an input layer, two graph convolusional layers
+and an output layer. The network is fully connected with 4 neurons in
+the input layer, 16 in both graph convolusional layers and 1 neuron in
+the output layer.
 
-Evaluation metrics used for evaluating the pattern matrix model are
-used to evaluate the GCD model as well (see Section
-\ref{sec:pm-model-eval}) since the GCD dataset is also highly skewed
-in nature.
+Evaluation metrics used for evaluating the MLP model are used to
+evaluate the GCD model as well (see Section \ref{sec:mlp-model-eval})
+since the GCN dataset is also highly skewed in nature.
 
 \section{Discussion}
 \label{sec[gcd-disc]}

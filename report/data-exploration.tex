@@ -12,8 +12,6 @@ visualizations to observe any patterns and "local trends" that may be
 present. The following chapter presents the analysis that were done and the
 observations made.
 
-% TODO an introduction to data exploration and why it's important?
-
 Note that a random sample of only 10\% of the data was taken for the following
 visualizations. This is because it is difficult to draw reasonable conclusions
 from the plots due to the high number of data points when the entire dataset is
@@ -30,8 +28,8 @@ used.
     \hline
     Column & Data type & Unit & Description \\
     \hline
-    pos\_x, pos\_y, pos\_z & float & meters (m) & The position within the detector where the hit was detected, they represent the x,y,z coordinates of the hit respectively. \\
-    time & float & nano seconds (ns) & The time at which the hit was detected. \\
+    x, y, z & float & meters (m) & The position within the detector where the hit was detected, they represent the x,y,z coordinates of the hit respectively. \\
+    t & float & nano seconds (ns) & The time at which the hit was detected. \\
     label & int & NA & The type of hit, '0' represents noise and '1' represents a neutrino hit \\
     event\_id & int & NA & The id of the event to which the hit is related to. The id itself does not have any meaning, it is simply used to identify hits that originated from the same event. \\
     timeslice & int & NA & The id of the timeslice to which the hit belongs. The id itself does not have any meaning, it is simply used to group hits into discrete bins. \\
@@ -46,17 +44,24 @@ dataset. The dataset does not contain any \texttt{nan} or \texttt{null} values
 except for the \texttt{event\_id} column where rows containing noise hits are
 not associated with any event.
 
-Next, the correlations amongst features is checked, the "Pearson" correlation
-is used. Figure \ref{fig:corr} represents the correlation matrix of all
-features. No significant correlations are observed between \texttt{pos\_x},
-\texttt{pos\_y}, \texttt{pos\_z} and \texttt{time} which indicates that ML
-models may not be able to learn anything from the dataset without the aid of
-feature engineering.
+\begin{wrapfigure}{r}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{dist-label.png}
+  \caption{Distribution of \texttt{label} column}%
+  \label{fig:dist-label}
+\end{wrapfigure}
+
+Next, the correlations amongst features is checked, the "Pearson"
+correlation is used. Figure \ref{fig:corr} represents the correlation
+matrix of all features. No significant correlations are observed
+between \texttt{x}, \texttt{y}, \texttt{z} and \texttt{t} which
+indicates that ML models may not be able to learn anything from the
+dataset without the aid of feature engineering.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\linewidth]{correlation.png}
-  \caption{Correlation matrix of features}%
+  \caption{Correlation matrix of features}
   \label{fig:corr}
 \end{figure}
 
@@ -67,22 +72,13 @@ compared to over 4.5 million instances of noise. An effective strategy to
 handle the class imbalance will need to be devised during training of models
 to prevent the model from overfitting.
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.8\linewidth]{dist-label.png}
-  \caption{Distribution of \texttt{label} column}%
-  \label{fig:dist-label}
-\end{figure}
-
-
-
 \begin{table}[t]
   \centering
   \caption{Descriptive statistics}
   \label{tab:desc-stats}
   \begin{tabular}{lrrrrrrr}
     \hline
-          & pos\_x & pos\_y & pos\_z & time & label & event\_id & time slice \\
+          & x & y & z & t & label & event\_id & timeslice \\
     \hline
     count & 4.58e+7 &  4.58e+7 &  4.58e+7 &  4.58e+7 &  4.58e+7 &  489906 &  4.58e+7 \\
     mean  & 1.16e-02 & -1.59e-02 &  1.17e+02 &  5.00e+07 &  1.06e-02 &    2862.00 &  3.33e+03 \\
@@ -96,7 +92,6 @@ to prevent the model from overfitting.
   \end{tabular}
 \end{table}
 
-
 \section{Verification of Bias}%
 \label{sec:data-exp-verification-bias}
 
@@ -108,37 +103,46 @@ thus fail to generalize. If this pattern does exist in the dataset, corrective
 measures need to be taken such that the event hits in each timeslice are
 uniformly distributed.
 
-To verify the existence of such patterns in the dataset, the mean \texttt{time}
-of event hits across all events was visualized. Figure
-\ref{fig:bias-verification} depicts a scatter plot of mean \texttt{time} across
-events. A uniform distribution is noted with no visible patterns. Thus no bias exists in the dataset and is deemed suitable for further analysis.
+To verify the existence of such patterns in the dataset, the mean time
+of event hits across all events was visualized as a scatter plot as
+depicted by Figure \ref{fig:bias-verification}. A uniform distribution
+is noted with no visible patterns. Thus no bias exists in the dataset
+and it is deemed suitable for further analysis.
 
-\begin{figure}[h]
+\begin{wrapfigure}{l}{0.5\textwidth}
   \centering
-  \includegraphics[width=0.8\linewidth]{bias-verification.png}
+  \includegraphics[width=0.9\linewidth]{bias-verification.png}
   \caption{Verification of Bias}%
   \label{fig:bias-verification}
-\end{figure}
+\end{wrapfigure}
 
 \section{Exploration of Interesting Timeslices}%
 \label{sec:data-exp-interesting-timeslices}
 
-Figure \ref{fig:dist-hits-per-timeslice} represents to total number of event hits per timeslice. The dataset is discretized into 6759 timeslices of which 2783 timeslices contain only noise hits. This is corroborated by Figure \ref{fig:dist-hits-per-timeslice} which presents a long tail distribution where many timeslices contain few to no event hits and few timeslices contain a high number of event hits.
+Figure \ref{fig:dist-hits-per-timeslice} represents to total number of
+event hits per timeslice. The dataset is discretized into 6759
+timeslices of which 2783 timeslices contain only noise hits. This is
+corroborated by Figure \ref{fig:dist-hits-per-timeslice} which
+presents a skewed distribution where many timeslices contain few to no
+event hits and few timeslices contain a high number of event hits.
 
-\begin{figure}[h]
+\begin{wrapfigure}{r}{0.5\textwidth}
   \centering
-  \includegraphics[width=0.8\linewidth]{dist-hits-per-timeslice.png}
+  \includegraphics[width=0.9\linewidth]{dist-hits-per-timeslice.png}
   \caption{Distribution of event hits per timeslice}%
   \label{fig:dist-hits-per-timeslice}
-\end{figure}
+\end{wrapfigure}
 
-Figure \ref{fig:dist-timeslice-largest} depicts a scatter plot of \emph{timeslice 615} which contains the largest number of event hits. It is observed that event hits occur close to each other in space and time (represented by the yellow, blue and green points) whilst background hits are uniformly distributed in space and time (represented by the purple points).
-
-% TODO visualize in 3D as well?
+Figure \ref{fig:dist-timeslice-largest} depicts a scatter plot of
+\emph{timeslice 615} which contains the largest number of event hits.
+It is observed that event hits occur close to each other in space and
+time (represented by the yellow, blue and green points) whilst
+background hits are uniformly distributed in space and time
+(represented by the purple points).
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.8\linewidth]{dist-timeslice-largest-posx-time-eventid.png}
+  \includegraphics[width=0.9\linewidth]{dist-timeslice-largest-posx-time-eventid.png}
   \caption{Distribution of Timeslice 615}%
   \label{fig:dist-timeslice-largest}
 \end{figure}
