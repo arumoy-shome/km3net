@@ -26,18 +26,20 @@ a CSV file for future use.
 \section{Preparation of \emph{noise} dataset}%
 \label{sec:data-prep-noise}
 The \emph{noise} data was generated using a Python library written and
-maintained by Nikhef, \texttt{k40gen}. \texttt{k40gen.Generators(21341, 1245,
-[7000., 700., 70., 0.])} was used to create an instance of a generator where
-the first two arguments are random seeds followed by a list of rates at which
-single, double, triple and quadruple hits should be generated. The generator
-instance is then passed into \texttt{k40gen.generate\_40()} method which
-returns a (4, n) array containing (time, dom\_id, pmt\_id, tot). The position
-coordinates (ie. \texttt{x}, \texttt{y}, \texttt{z} coordinates) for each
-datapoint was provided in a \emph{positions.detx} file which was parsed using
-the Numpy Python package \cite{numpy} and added to the \emph{noise} array. The
-Python library Pandas \cite{pandas} was used to convert the array into a (n, 4)
-dataframe. A \texttt{label} column was added containing a value of '0' and the
-dataframe was saved as a 3.9GB CSV file.
+maintained by Nikhef, \texttt{k40gen}.
+\texttt{k40gen.Generators(21341, 1245, [7000., 700., 70., 0.])} was
+used to create an instance of a generator where the first two
+arguments are random seeds followed by a list of rates at which
+single, double, triple and quadruple hits should be generated. The
+generator instance is then passed into \texttt{k40gen.generate\_40()}
+method which returns a (4, n) array containing (time (t), dom\_id,
+pmt\_id, time over threshold (tot)). The position coordinates (ie.
+\texttt{x}, \texttt{y}, \texttt{z} coordinates) for each datapoint was
+provided in a \emph{positions.detx} file which was parsed using the
+Numpy Python package \cite{numpy} and added to the \emph{noise} array.
+The Python library Pandas \cite{pandas} was used to convert the array
+into a (n, 4) dataframe. A \texttt{label} column was added containing
+a value of '0' and the dataframe was saved as a 3.9GB CSV file.
 
 \section{Preparation of \emph{main} dataset}%
 \label{sec:data-prep-main}
