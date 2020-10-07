@@ -24,10 +24,6 @@
 \usepackage{array}
 \usepackage{pdfpages}
 
-%\usepackage{graphics}
-% or use the graphicx package for more complicated commands
-%\usepackage{graphicx}
-
 %: ----------------------- bibliography ------------------------
 
 % The section below defines how references are listed and formatted
@@ -45,8 +41,6 @@
 
 %\end{tiny}
 %\end{multicols}
-
-
 
 % --------------------------------------------------------------
 % Various bibliography styles exit. Replace above style as desired.
@@ -101,23 +95,24 @@ Vrije Universiteit Amsterdam \hspace*{2cm} Universiteit van Amsterdam
 \vspace*{1.5cm}
 
 \rule{.9\linewidth}{.6pt}\\[0.4cm]
-{\huge \bfseries Title of the Thesis\par}\vspace{0.4cm}
+{\huge \bfseries KM3NeT Neutrino (Deep Learning|Neural Networks) Detection \par}\vspace{0.4cm}
 \rule{.9\linewidth}{.6pt}\\[1.5cm]
 
 \vspace*{2mm}
 
 {\Large
 \begin{tabular}{l}
-{\bf Author:} ~~student name ~~~~ (student number)
+{\bf Author:} ~~Arumoy Shome ~~~~ (2636393)
 \end{tabular}
 }
 
 \vspace*{2cm}
 
 \begin{tabular}{ll}
-{\it 1st supervisor:}   & ~~supervisor name \\
-{\it daily supervisor:} & ~~supervisor name ~~~~ (company, if applicable) \\
-{\it 2nd reader:}       & ~~supervisor name
+{\it 1st supervisor:}   & ~~Dr. Adam Belloum \\
+{\it 2nd supervisor:} & ~~Ben van Werkhoven ~~~~ (Netherlands eScience
+Center) \\
+{\it 2nd reader:}       & ~~Dr. FINDME
 \end{tabular}
 
 \vspace*{2.5cm}
@@ -155,9 +150,9 @@ Vrije Universiteit Amsterdam \hspace*{2cm} Universiteit van Amsterdam
 
 %: ----------------------- generate cover page ------------------------
 
-\begin{center}
-\textit{``I am the master of my fate, I am the captain of my soul'' \\ from {\em Invictus}, by William Ernest Henley}
-\end{center}
+%% \begin{center}
+%% \textit{``I am the master of my fate, I am the captain of my soul'' \\ from {\em Invictus}, by William Ernest Henley}
+%% \end{center}
 
 %: ----------------------- cover page back side ------------------------
 % Your research institution may require reviewer names, etc.
@@ -218,8 +213,6 @@ Vrije Universiteit Amsterdam \hspace*{2cm} Universiteit van Amsterdam
 \listoftables  % print list of tables
 
 
-
-
 %: ----------------------- glossary ------------------------
 
 % Tie in external source file for definitions: /0-frontmatter/glossary.tex
@@ -258,8 +251,8 @@ Vrije Universiteit Amsterdam \hspace*{2cm} Universiteit van Amsterdam
 \include{karas-pipeline}
 \include{data-preparation}
 \include{data-exploration}
-\include{pm}
-\include{gcd}
+\include{mlp}
+\include{gcn}
 \include{recommendations}
 
 %\include{6_conclusion/conclusion}
