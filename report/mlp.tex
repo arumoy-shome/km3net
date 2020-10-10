@@ -188,13 +188,12 @@ recommended as good defaults by machine learning practitioners
 
 \begin{table}[htb]
   \centering
-  \begin{tabular}{lrrr}
+  \begin{tabular}{lrrrr}
     \hline
-    Layer Position & Type & Activation & Number of Neurons \\
-    1 (input) & Linear & -- & 4 \\
-    2 (hidden) & Linear & ReLU & 16 \\
-    3 (hidden) & Linear & ReLU & 8 \\
-    4 (output) & Linear & Sigmoid & 1 \\
+    Layer Position & Type & Activation & In features & Out features \\
+    1 & Linear & ReLu & 4 & 16 \\
+    2 & Linear & ReLU & 16 & 8 \\
+    3 & Linear & Sigmoid & 8 & 1 \\
     \hline
   \end{tabular}
   \caption{MLP Model Architecture Summary.}
@@ -327,6 +326,11 @@ binary classification on skewed datasets are considered as well.
 \section{Results}
 \label{sec:mlp-disc}
 
+%% TODO limitation: due to stocastic nature of hits, mlp is unable to
+%% solve the problem of truly unrelated hits being classified as related
+%% hits. This is the reason why performance of the model decreases as we
+%% increase the number of event hits (TS4)
+
 Figure \ref{fig:mlp-learning} shows the learning curve of the model on
 the training and validation tests. The curves approach zero with time
 and remain in close proximity to each other indicating a good fit.
@@ -341,13 +345,14 @@ the TPs in the datasets, the precision falls drastically. This is also
 corroborated by the fact that the recall in TS4 increases due to a
 better FP:TP ratio (see Figure \ref{fig:mlp-cm}).
 
-\begin{minipage}{0.24\textwidth}
+\begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{mlp-learning.png}
+  \includegraphics[width=0.5\textwidth]{mlp-learning.png}
   \caption{Learning Curve of MLP Training and Validation Datasets.}
   \label{fig:mlp-learning}
-\end{minipage}
-\begin{minipage}{0.74\textwidth}
+\end{figure}
+
+\begin{table}[htb]
     \centering
     \begin{tabular}{rrrrrrrr}
       \hline
@@ -360,7 +365,7 @@ better FP:TP ratio (see Figure \ref{fig:mlp-cm}).
     \end{tabular}
     \caption{Summary of MLP performance across test sets.}
     \label{tab:mlp-results}
-\end{minipage}
+\end{table}
 
 \begin{figure}[htb]
   \centering
@@ -417,36 +422,13 @@ skewed FP:TP ratio which results in the PRAUC to also be zero.
   \label{fig:mlp-pr}
 \end{figure}
 
-\begin{figure}[htb]
-  \centering
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{mlp-cm-norm-low.png}
-    \caption{Norm Confusion Matrix for TS2.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{mlp-cm-norm-medium.png}
-    \caption{Norm Confusion Matrix for TS3.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{mlp-cm-norm-high.png}
-    \caption{Norm Confusion Matrix for TS4.}
-  \end{minipage}
-  \caption{Normalized Confusion Matrices of MLP Test Datasets.}
-  \label{fig:mlp-cm-norm}
-\end{figure}
-
 Figure \ref{fig:mlp-cm} depict the confusion matrices for the various
-test datasets. Alternatively, Figure \ref{fig:mlp-cm-norm} can also be
-consulted which presents the confusion matrices normalized across the
-rows. The confusion matrices highlight the strengths and weaknesses of
-the model better than the ROC and PR curves. The model has a very low
-number of FNs and FPs which is extremely valuable as this ensures that
-the model does not miss hits from neutrino events and also does not
-classify hits from noise sources incorrectly as hits from neutrino
-events.
+test datasets. The confusion matrices highlight the strengths and
+weaknesses of the model better than the ROC and PR curves. The model
+has a very low number of FNs and FPs which is extremely valuable as
+this ensures that the model does not miss hits from neutrino events
+and also does not classify hits from noise sources incorrectly as hits
+from neutrino events.
 
 \begin{figure}[htb]
   \centering
