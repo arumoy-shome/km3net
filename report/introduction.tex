@@ -80,11 +80,11 @@ existing event trigger algorithms namely \emph{L1} and \emph{L2}
 although able to conduct the filtration in near real, lack the ability
 to do so with high accuracy thus often failing to save important
 timeslices \cite{karas2019data}. Efforts have already been made to
-improve the existing event trigger algorithms. Karas et al. proposed
-and implemented a GPU powered pipeline which utilizes correlation and
-graph community detection to identify time slices that may contain
-neutrino hits whilst \cite{post2019km3nnet} suggests an alternate
-using convolutional neural networks.
+improve the existing event trigger algorithms. Karas et al. (2019)
+proposed and implemented a GPU powered pipeline which utilizes
+correlation and graph community detection to identify time slices that
+may contain neutrino hits whilst Post et al. (2019) suggests an
+alternate using convolutional neural networks.
 
 \section{User Requirements}
 \label{sec:user-req}
@@ -120,10 +120,11 @@ data acquisition pipeline are as follows.
 \section{Research Question}
 \label{sec:rqs}
 
-This report intends to improve upon \emph{The Karas Pipeline}, a GPU
-pipeline proposed by Karas et al. to combat the limitations of the L1
-and L2 event trigger algorithms. Specifically this project sought to
-answer the following research questions.
+This report presents research to improve upon \emph{The Karas
+Pipeline}, a GPU pipeline proposed by Karas et al. (2019) to combat
+the limitations of the L1 and L2 event trigger algorithms.
+Specifically this project sought to answer the following research
+questions.
 
 \begin{enumerate}
   \item[\textbf{RQ1}.] \textbf{Can the existing GPU pipeline be improved using neural networks (NNs)?}
@@ -143,31 +144,31 @@ answer the following research questions.
     a novel trigger criterion which given a pair of points, can
     quantify the level of correlation amongst the points with an
     accuracy of 80\%. The first phase of this project focuses on
-    achieving better accuracy to identify ``causally related'' points
-    using a Multi Layer Perceptron (MLP).
+    achieving better accuracy to identify such ``causally related''
+    points using a Multi Layer Perceptron (MLP).
     
   \item[\textbf{RQ3.}] \textbf{Can the \emph{Graph Community Detection Step} be replaced with a Graph Convolusional Neural Network?}
 
     The output of the Hit Correlation Step is used to create a graph
     structure where hits (of neutrino and noise) are represented as
-    nodes and causally related nodes are connected with an undirected
-    edge carrying the probability of correlation as its weight. The
-    Constant Pots clustering algorithm, which operates on the
-    principles of Graph Community Detection, is used to separate the
+    nodes connected with an undirected edge carrying the probability
+    of correlation as its weight. The Constant Pots clustering
+    algorithm, which operates on the principles of Graph Community
+    Detection \cite{fortunato2010community}, is used to separate the
     graph into communities of neutrino and noise hits. The second
     phase of this project focuses on achieving a better accuracy for
     clustering neutrino and noise hits into separate communities in a
-    given timeslice using Graph Convolusional Neural Networks (GCNs).
+    given timeslice using Graph Convolusional Neural Networks (GCNs)
+    \cite{kipf2016semi}.
 \end{enumerate}
 
 The following chapters of this report present the research efforts
 carried out to improve The Karas Pipeline using Artificial Neural
-Networks. In Chapter \ref{cha:data-prep} the steps taken to prepare
-the dataset used in this project is presented followed by its
-statistical analysis and visual exploration in Chapter
-\ref{cha:data-exp}. Since this research initiative is a direct
-offshoot of the work previously conducted by Karas et al., an overview
-of The Karas Pipeline is presented in Chapter
+Networks. In Chapter \ref{cha:data} the steps taken to prepare the
+dataset used in this project is presented followed by its statistical
+analysis and visual exploration. Since this research initiative is a
+direct offshoot of the work previously conducted by Karas et al.
+(2019), an overview of The Karas Pipeline is presented in Chapter
 \ref{cha:karas-pipeline}. Chapters \ref{cha:mlp} and \ref{cha:gcn}
 present detailed analysis of the neural networks created to replace
 segments of The Karas Pipeline. Drawing from the results of the
