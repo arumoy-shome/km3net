@@ -103,8 +103,9 @@ validation sets.
   \begin{tabular}{lrrr}
     \hline
     & Total examples & Positive examples & Negative examples \\
-    Training & 48,434 & 24,217 & 24,217 \\
-    Validation & 23,856 & 11,928 & 11,928 \\
+    \hline
+    \textbf{Training} & 48,434 & 24,217 & 24,217 \\
+    \textbf{Validation} & 23,856 & 11,928 & 11,928 \\
     \hline
   \end{tabular}
   \label{tab:mlp-train-dist}  
@@ -128,6 +129,7 @@ performance of the model on TS1 and TS2 are of vital importance.
   \begin{tabular}{lrrr}
     \hline
     & Total examples & Positive examples & Negative examples \\
+    \hline
     \textbf{TS1} & 774,390 & -- & 774,390 \\
     \textbf{TS2} & 5,829,405 & 10 & 5,829,395 \\
     \textbf{TS3} & 5,880,735 & 1176 & 5,879,559 \\
@@ -149,6 +151,7 @@ over pairs of points and classify unseen data as related or unrelated.
 
 \begin{table}[htb]
   \centering
+  \caption{GCN Model Parameter Summary.}
   \begin{tabular}{lr}
     \hline
     Loss & BCELoss \\
@@ -160,7 +163,6 @@ over pairs of points and classify unseen data as related or unrelated.
     Testing batch size & 32 \\
     \hline
   \end{tabular}
-  \caption{GCN Model Parameter Summary.}
   \label{tab:gcn-model-param}
 \end{table}
 
@@ -187,15 +189,16 @@ recommended as good defaults by machine learning practitioners
 
 \begin{table}[htb]
   \centering
+  \caption{MLP Model Architecture Summary.}
   \begin{tabular}{lrrrr}
     \hline
     Layer Position & Type & Activation & In features & Out features \\
-    1 & Linear & ReLu & 4 & 16 \\
-    2 & Linear & ReLU & 16 & 8 \\
-    3 & Linear & Sigmoid & 8 & 1 \\
+    \hline
+    \textbf{1} & Linear & ReLu & 4 & 16 \\
+    \textbf{2} & Linear & ReLU & 16 & 8 \\
+    \textbf{3} & Linear & Sigmoid & 8 & 1 \\
     \hline
   \end{tabular}
-  \caption{MLP Model Architecture Summary.}
   \label{tab:mlp-model-arch}
 \end{table}
 
@@ -224,7 +227,7 @@ binary classification on skewed datasets are considered as well.
   Equation \ref{eq:accuracy}.
 
   \begin{equation}
-    Accuracy = \frac{Number of correct predictions}{Total number of examples}
+    Accuracy = \frac{\textit{Number of correct predictions}}{\textit{Total number of examples}}
     \label{eq:accuracy}
   \end{equation}
   
@@ -302,11 +305,12 @@ binary classification on skewed datasets are considered as well.
   without any skill is a straight line from $(0,0)$ to $(1,1)$ with a
   ROCAUC of 0.5.
 
-
   \begin{equation}
-    TPR = \frac{TP}{TP + FN}
-    FPR = \frac{FP}{FP + TN}
+    \begin{align*}
+      TPR = \frac{TP}{TP + FN} \\\\
+      FPR = \frac{FP}{FP + TN}
     \label{eq:tpr-fpr}
+    \end{align*}
   \end{equation}
   
 \item \textbf{Precision-Recall (PR) Curve} can be considered a better
@@ -352,17 +356,18 @@ better FP:TP ratio (see Figure \ref{fig:mlp-cm}).
 \end{figure}
 
 \begin{table}[htb]
-    \centering
+  \centering
+  \caption{Summary of MLP performance across test sets.}
     \begin{tabular}{rrrrrrrr}
       \hline
       & Accuracy & Precision & Recall & F1 & F2 & ROCAUC & PRAUC \\
-      TS1 & 0.80 & -- & -- & -- & -- & -- & -- \\
-      TS2 & 0.91 & 0.00 & 1.00 & 0.00 & 0.00 & 0.99 & 0.00 \\
-      TS3 & 0.92 & 0.00 & 0.98 & 0.00 & 0.01 & 0.98 & 0.01 \\
-      TS4 & 0.92 & 0.19 & 0.83 & 0.31 & 0.48 & 0.96 & 0.33 \\
+      \hline
+      \textbf{TS1} & 0.80 & -- & -- & -- & -- & -- & -- \\
+      \textbf{TS2} & 0.91 & 0.00 & 1.00 & 0.00 & 0.00 & 0.99 & 0.00 \\
+      \textbf{TS3} & 0.92 & 0.00 & 0.98 & 0.00 & 0.01 & 0.98 & 0.01 \\
+      \textbf{TS4} & 0.92 & 0.19 & 0.83 & 0.31 & 0.48 & 0.96 & 0.33 \\
       \hline
     \end{tabular}
-    \caption{Summary of MLP performance across test sets.}
     \label{tab:mlp-results}
 \end{table}
 

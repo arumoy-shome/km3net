@@ -112,10 +112,13 @@ summarized in Table \ref{gcn-test-dist}.
   \centering
   \caption{Distribution of GCN testing datasets.}
   \begin{tabular}{lrrr}
+    \hline
     & Total examples & Positive examples & Negative examples \\
+    \hline
     \textbf{TS1} & 1000-1500 & -- & 1000-1500 \\
     \textbf{TS2} & 1000-1500 & 10-20 & 990-1480 \\
     \textbf{TS3} & 1000-1500 & 200-250 & 800-1250 \\
+    \hline
   \end{tabular}
   \label{tab:gcn-test-dst}
 \end{table}
@@ -125,6 +128,7 @@ summarized in Table \ref{gcn-test-dist}.
 
 \begin{table}[htb]
   \centering
+  \caption{GCN Model Parameter Summary.}
   \begin{tabular}{lr}
     \hline
     Loss & BCELoss \\
@@ -133,7 +137,6 @@ summarized in Table \ref{gcn-test-dist}.
     Output Activation & Sigmoid \\
     \hline
   \end{tabular}
-  \caption{GCN Model Parameter Summary.}
   \label{tab:gcn-model-param}
 \end{table}
 
@@ -156,15 +159,16 @@ kept the same (see Section \ref{sec:mlp-model-eval}) since the GCN
 dataset is also highly skewed in nature.
 
 \begin{table}
+  \centering
   \caption{GCN model architecture summary.}
   \begin{tabular}{lrrrr}
     \hline
     Layer position & Type & Activation & In features & Out features \\
     \hline
-    1 & GConv & ReLU & 4 & 16 \\
-    2 & dropout & -- & -- \\
-    3 & GConv & RelU & 16 & 2 \\
-    4 & Linear & Sigmoid & 2 & 1 \\
+    \textbf{1} & GConv & ReLU & 4 & 16 \\
+    \textbf{2} & dropout & -- & -- \\
+    \textbf{3} & GConv & RelU & 16 & 2 \\
+    \textbf{4} & Linear & Sigmoid & 2 & 1 \\
     \hline
   \end{tabular}
   \label{tab:gcn-model-arch}
@@ -187,7 +191,7 @@ dataset is also highly skewed in nature.
     \hline
     & Accuracy & Precision & Recall & F1 & F2 & ROCAUC & PRAUC \\
     \hline
-    \textbf{TS1} & TODO & -- & -- & -- & -- & -- & -- \\
+    \textbf{TS1} & 0.52 & -- & -- & -- & -- & -- & -- \\
     \textbf{TS2} & 0.58 & 0.04 & 1.00 & 0.08 & 0.18 & 0.87 & 0.06 \\
     \textbf{TS3} & 0.67 & 0.40 & 1.00 & 0.57 & 0.77 & 0.81 & 0.36 \\
     \hline
