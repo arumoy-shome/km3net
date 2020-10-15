@@ -13,16 +13,16 @@ report. The chapter also presents alternative paths of research which
 remain unexplored and general improvements that can be made to the
 pipeline in the future.
 
-The Multi Layered Perceptron presented in Chapter \ref{cha:mlp}
+The Multi Layer Perceptron presented in Chapter \ref{cha:mlp} is
 capable of identifying causally related hits with a higher accuracy,
 precision and recall compared to the Pattern Matrix Criterion
-presented by Karas et al. and thus is considered a viable successor to
-the PMC. Although experiments were done to identify the optimal
-parameters such as the batch size, optimization function, learning
-rate, height and depth of the network, further experimentation is
-recommended before it is integrated into the Data Acquisition
-Pipeline. The model also showed an increase in the number of FPs when
-the number of positive class examples are increased. It may be
+presented by Karas et al. (2019). It is therefore considered a viable
+successor to the PMC. Although experiments were done to identify the
+optimal parameters such as the batch size, optimization function,
+learning rate, height and depth of the network, further
+experimentation is recommended before it is integrated into the Data
+Acquisition Pipeline. The model also showed an increase in the number
+of FPs when the number of positive class examples increased. It may be
 possible to correct this bias by adding some regularization into the
 model \cite{Goodfellow-et-al-2016}.
 
@@ -109,12 +109,12 @@ TS2.
 Although the GCN is now capable of identifying event and noise nodes
 with immaculate accuracy, precision and recall, it however classifies
 all examples as false positives in TS1 which contains no event nodes.
-The model is thrown off by the high weights on edges between causally
+The model is impeded by the high weights on edges between causally
 related event nodes and noise nodes, which may be possible correct by
 framing the data as a multi-edge heterogeneous graph. By creating
 different types of edges corresponding to the various types of
 connections that two nodes may posses, each carrying the corresponding
-weights, the network may be able to correct it's bias to the positive
+weights, the network may be able to correct its bias to the positive
 class. In order to obtain the advanced edge weight, the MLP must be
 modified such that it performs multi-class classification on the edge
 types. For a classification problem of n edge types, the output of the
@@ -122,12 +122,10 @@ MLP will thus become a \texttt{(n,)} vector containing the expected
 probability for each class. These probabilities can then be used as
 the edge weights as illustrated in Figure \ref{fig:gcn-hetero}. The
 MLP may not be able to discern causally unrelated hits since they are
-spread evenly in space and time, thus research to identify an
-appropriate model for the task is required. One approach may be to use
-a GCN to perform classification of the edge types or regression on the
-edge weights \cite{gong2019exploiting} however this remains to be
-validated.
-% TODO illustrate heterogeneous graph approach
+spread evenly in space and time. Thus research to identify an
+appropriate model for the task is required. One such approach may be
+to use a GCN to perform classification of the edge types or regression
+on the edge weights \cite{gong2019exploiting}.
 
 \begin{table}[htb]
   \centering
@@ -137,44 +135,43 @@ validated.
     \hline
     & Accuracy & Precision & Recall & F1 & F2 & ROCAUC & PRAUC \\
     \hline
-    TS1 & 0.00 & -- & -- & -- & -- & -- & -- \\
-    TS2 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
-    TS3 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+    \textbf{TS1} & 0.00 & -- & -- & -- & -- & -- & -- \\
+    \textbf{TS2} & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+    \textbf{TS3} & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
     \hline
   \end{tabular}
   \label{tab:gcn-results-adv}
 \end{table}
 
-We observed a high coupling of the Hit Correlation Step with the
-subsequent steps of the Karas Pipeline. The output of the PMC is used
-by the steps that follow so any shortcomings of the PMC cascade down
-the pipeline and affect the performance of the latter steps and the
-pipeline as a whole. This coupling is also present in the new pipeline
-as the performance of the MLP directly dictates the performance of the
-GCN. This coupling is not ideal and an effective solution to decouple
-the two models is required. One such solution which remains open as a
-path of research is to explore the possibility of replacing the entire
-pipeline with a single GCN. The data can be framed such that the $(x,
-y, z)$ vectors are used as the node embedding. If the \emph{t} is
-scaled between $[0, 1]$ and the complement of $\delta t$ is assigned
-as the edge weights, it should result in a graph where edges between
-causally related nodes carry a high weight. After convolusion, a
-reasonable expectation is the presence of small and tightly connected
-communities of causally related nodes and large, weakly connected
-communities of noise nodes. The GCN model can now be modified to
-perform graph classification \cite{zhang2018end} instead of node
-classification, the premise being that presence of small, densely
-connected communities indicate the timeslice is important and thus
-should be saved for further analysis. Alternatively, the Line Graph
-Neural Network proposed by Chen et al. (2017) can also be used to
-perform community detection.
+There is a high dependency on the Hit Correlation Step by the
+subsequent steps of the GPU Pipeline. The output of the PMC is used by
+these subsequent steps so any shortcomings of the PMC cascade down
+affecting the performance of the latter steps and the pipeline as a
+whole. This dependency is also present in the new pipeline as the
+performance of the MLP directly dictates the performance of the GCN.
+This dependency is not ideal and an effective solution to make the
+models independent is required. One such solution is to explore the
+possibility of replacing the entire pipeline with a single GCN. The
+data can be framed such that the $(x, y, z)$ vectors are used as the
+node embedding. If the \emph{t} is scaled between $[0, 1]$ and the
+complement of $\Delta t$ is assigned as the edge weights, it should
+result in a graph where edges between causally related nodes carry a
+high weight. After convolusion, a reasonable expectation is the
+presence of small and tightly connected communities of causally
+related nodes and large, weakly connected communities of noise nodes.
+The GCN model can now be modified to perform graph classification
+\cite{zhang2018end} instead of node classification. The premise being
+that presence of small, densely connected communities indicate the
+timeslice is important and thus should be saved for further analysis.
+Alternatively, the Line Graph Neural Network proposed by Chen et al.
+(2017) built specifically for community detection can also be used.
 
 The models presented in this report were tested in isolation. The
 intended usage however is to use them in tandem in order to identify
 timeslices containing neutrino event hits. Thus it is recommended that
 the models be tested as an integrated pipeline so that the results may
-be compared to that of The Karas Pipeline. Additionally, performance
-of the pipeline should be observed using various permutations of the
+be compared to that of the GPU Pipeline. Additionally, performance of
+the pipeline should be observed using various permutations of the
 individual parts of the new and the old pipeline to determine the best
 performing combination overall. As noted in Section
 \ref{sec:user-req}, the runtime performance of the pipeline is crucial
