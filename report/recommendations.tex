@@ -112,29 +112,22 @@ Although the GCN is now capable of identifying event and noise nodes
 with immaculate accuracy, precision and recall, it however classifies
 all examples as false positives in TS1 which contains no event nodes.
 The model is impeded by the high weights on edges between causally
-related event nodes and noise nodes, which may be possible correct by
-framing the data as a multi-edge heterogeneous graph. By creating
-different types of edges corresponding to the various types of
-connections that two nodes may posses, each carrying the corresponding
-weights, the network may be able to correct its bias to the positive
-class. In order to obtain the advanced edge weight, the MLP must be
-modified such that it performs multi-class classification on the edge
-types. For a classification problem of n edge types, the output of the
-MLP will thus become a \texttt{(n,)} vector containing the expected
+related event nodes and noise nodes, which may be corrected by framing
+the data as a multi-edge heterogeneous graph. By creating different
+types of edges corresponding to the various types of connections that
+two nodes may posses, each carrying the corresponding weights, the
+network may be able to correct its bias to the positive class. In
+order to obtain the advanced edge weight, the MLP must be modified
+such that it performs multi-class classification on the edge types.
+For a classification problem of n edge types, the output of the MLP
+will thus become a \texttt{(n,)} vector containing the expected
 probability for each class. These probabilities can then be used as
-the edge weights as illustrated in Figure \ref{fig:gcn-hetero}. The
-MLP may not be able to discern causally unrelated hits since they are
-spread evenly in space and time. Thus research to identify an
-appropriate model for the task is required. One such approach may be
-to use a GCN to perform classification of the edge types or regression
-on the edge weights \cite{gong2019exploiting}.
-
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=\textwidth]{gcn-hetero.jpg}
-  \caption{Heterogeneous graph for GCN.}
-  \label{fig:gcn-hetero}
-\end{figure}
+the edge weights. The MLP may not be able to discern causally
+unrelated hits since they are spread evenly in space and time. Thus
+research to identify an appropriate model for the task is required.
+One such approach may be to use a GCN to perform classification of the
+edge types or regression on the edge weights
+\cite{gong2019exploiting}.
 
 \begin{table}[htb]
   \centering
@@ -180,7 +173,12 @@ for community detection can also be used.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{gcn-ind.jpg}
-  \caption{Embeddings of graph.}
+  \caption{Illustration of a possible training set for the graph
+    classification model. \textbf{(1)} Graphs containing neutrino
+    events can be identified by the presence of small and tightly
+    connected communities. \textbf{(2)} In contrast, graphs containing
+    only noise nodes will only contain large, loosely connected
+    communities}
   \label{fig:gcn-ind}
 \end{figure}
 
