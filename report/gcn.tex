@@ -50,6 +50,17 @@ and dislikes in regards to food items. Here, two entities, namely
 people and food are represented as nodes. The edges also come in two
 variants ie. a 'like' and a 'dislike'.
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{gcn-message-passing.jpg}
+  \caption{Message passing paradigm of GCNs. \textbf{(1)} An example
+  of a fully connected graph with 5 nodes. The edge weights are hidden
+  for simplicity. \textbf{(2)} Each node sends its embedding to its
+  neighbors. \textbf{(3)} The aggregated embedding becomes the new
+  node embedding thus changing the structure of the graph.}
+  \label{fig:gcn-message-passing}
+\end{figure}
+
 % TODO illustrate the paradigm
 GCNs learn by utilizing a message passing paradigm which is summarized
 in Figure \ref{gcn-message-passing}. During each training epoch, all
