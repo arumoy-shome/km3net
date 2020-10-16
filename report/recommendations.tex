@@ -7,12 +7,13 @@
 % ----------------------- contents from here ------------------------
 %
 
-This chapter presents some practical recommendations for the readers
-who wish to use the new data processing pipeline presented in this
-report. The chapter also presents alternative paths of research which
-remain unexplored and general improvements that can be made to the
-pipeline in the future.
+This chapter presents practical recommendations for the readers who
+wish to use the new data processing pipeline presented in this report.
+The chapter also presents alternative paths of research which remain
+unexplored and general improvements that can be made to the pipeline
+in the future.
 
+\section{On the MLP}
 The Multi Layer Perceptron presented in Chapter \ref{cha:mlp} is
 capable of identifying causally related hits with a higher accuracy,
 precision and recall compared to the Pattern Matrix Criterion
@@ -42,6 +43,7 @@ model \cite{Goodfellow-et-al-2016}.
   \label{tab:gcn-adv-weights}
 \end{table}
 
+\section{On the GCN}
 The GCN obtained in Chapter \ref{cha:gcn} has a perfect recall however
 is also significantly biased to the positive class (event nodes) and
 thus unable to identify the negative class (noise nodes). The origin
@@ -127,6 +129,13 @@ appropriate model for the task is required. One such approach may be
 to use a GCN to perform classification of the edge types or regression
 on the edge weights \cite{gong2019exploiting}.
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{gcn-hetero.jpg}
+  \caption{Heterogeneous graph for GCN.}
+  \label{fig:gcn-hetero}
+\end{figure}
+
 \begin{table}[htb]
   \centering
   \caption{Summary of GCN performance across test sets with advanced
@@ -143,6 +152,7 @@ on the edge weights \cite{gong2019exploiting}.
   \label{tab:gcn-results-adv}
 \end{table}
 
+\section{On Independence of the Models}
 There is a high dependency on the Hit Correlation Step by the
 subsequent steps of the GPU Pipeline. The output of the PMC is used by
 these subsequent steps so any shortcomings of the PMC cascade down
@@ -158,14 +168,23 @@ complement of $\Delta t$ is assigned as the edge weights, it should
 result in a graph where edges between causally related nodes carry a
 high weight. After convolusion, a reasonable expectation is the
 presence of small and tightly connected communities of causally
-related nodes and large, weakly connected communities of noise nodes.
-The GCN model can now be modified to perform graph classification
-\cite{zhang2018end} instead of node classification. The premise being
-that presence of small, densely connected communities indicate the
-timeslice is important and thus should be saved for further analysis.
-Alternatively, the Line Graph Neural Network proposed by Chen et al.
-(2017) built specifically for community detection can also be used.
+related nodes and large, weakly connected communities of noise nodes
+(illustrated in Figure \ref{fig:gcn-ind}). The GCN model can now be
+modified to perform graph classification \cite{zhang2018end} instead
+of node classification. The premise being that presence of small,
+densely connected communities indicate the timeslice is important and
+thus should be saved for further analysis. Alternatively, the Line
+Graph Neural Network proposed by Chen et al. (2017) built specifically
+for community detection can also be used.
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{gcn-ind.jpg}
+  \caption{Embeddings of graph.}
+  \label{fig:gcn-ind}
+\end{figure}
+
+\section{On the Runtime Performance}
 The models presented in this report were tested in isolation. The
 intended usage however is to use them in tandem in order to identify
 timeslices containing neutrino event hits. Thus it is recommended that
