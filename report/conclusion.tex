@@ -11,41 +11,40 @@ application of Deep Learning for neutrino detection in the KM3NeT
 detector. Chapter \ref{cha:intro} presented the problem space and its
 importance, the stakeholders and their requirements and finally the
 research questions this project sought to answer. In Chapter
-\ref{cha:data}, the procedure for creating the dataset were described.
+\ref{cha:data}, the procedure for creating the dataset was described.
 Statistical and visual analysis of the data revealed the lack of any
 correlations or trends amongst the features. Chapter
 \ref{cha:related-work} provided more background on the problem by
 analyzing the existing literature related to this project. Although
-Deep Learning is still an emerging field of research within the KM3NeT
-umbrella of research projects, its presence is certainly felt in the
-field of Particle Physics and signal-noise detection. An overview of
-The GPU Pipeline upon which this project is based on was provided.
-It's limitations were then outlined and motivation for a new pipeline
-was thus formed.
+Deep Learning is still an emerging field within the KM3NeT umbrella of
+research projects, its presence is felt in the field of Particle
+Physics and signal-noise detection. An overview of The GPU Pipeline
+upon which this project is based on was provided. Its limitations
+were then outlined and motivation for a new pipeline was thus formed.
 
-The first phase of this project was focused on improving the Hit
+The first phase of this project focused on improving the Hit
 Correlation Step of the GPU Pipeline using a Multi Layer Perception.
 In Chapter \ref{cha:mlp} the training and evaluation of such a model
 was presented. The model outperformed the existing Pattern Matrix
 Criterion and was able to identify causally related hits with higher
 accuracy, precision and recall in highly skewed test sets. The
-outcomes of the second phase of this project were presented in Chapter
+outcomes of the second phase of this project were described in Chapter
 \ref{cha:gcn}. Here, the Graph Convolusional Neural Network to replace
 the Graph Community Detection and the Classification Step of the GPU
 Pipeline was presented. The performance of the model was not ideal
 since it was biased to the positive class and unable to identify the
 negative class in the test sets.
 
-In Chapter \ref{cha:rec} avenues for future work were presented.
+In Chapter \ref{cha:rec} avenues for future work were discussed.
 Recommendations on improving the performance of the MLP, removing the
 bias in the GCN and reducing the interdependence of the two models
-were made. The MLP is felt to be a viable successor to the PMC due to
-its superior performance. Although the outcomes of the GCN model were
-unfavorable, the author strongly urges that the recommendations for
-its improvements are explored before dismissing Graph Neural Networks.
-Altogether, the project is deemed a success as the outcomes are
-sufficient to indicate that Deep Learning can certainly be used to
-improve the performance of the existing GPU Pipeline.
+were made. The MLP is felt to be a viable successor to the Pattern
+Matrix Criterion due to its superior performance. Although the outcome
+of the GCN model was unfavorable, the report urges that the
+recommendations for its improvements be explored before dismissing
+Graph Neural Networks. Altogether, the project is deemed a success as
+the outcome is sufficient to indicate that Deep Learning can be used
+to improve the performance of the existing GPU Pipeline.
 
 % ---------------------------------------------------------------------------
 % ----------------------- end of thesis sub-document ------------------------
