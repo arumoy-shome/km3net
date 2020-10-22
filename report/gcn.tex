@@ -53,29 +53,33 @@ variants ie. a 'like' and a 'dislike'.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{gcn-message-passing.jpg}
-  \caption{Message passing paradigm of GCNs. \textbf{(1)} An example
-  of a fully connected graph with 5 nodes. The edge weights are hidden
-  for simplicity. \textbf{(2)} Each node sends its embedding to its
-  neighbors. \textbf{(3)} The aggregated embedding becomes the new
-  node embedding thus changing the structure of the graph.}
+  \caption{Message passing paradigm of GCNs.}
   \label{fig:gcn-message-passing}
 \end{figure}
-
-% TODO illustrate the paradigm
+  
 GCNs learn by utilizing a message passing paradigm which is summarized
-in Figure \ref{gcn-message-passing}. During each training epoch, all
-nodes propagate their embedding to their neighbors. The collected
-embeddings are then aggregated (for example using a sum, difference or
-mean) which becomes the new embedding for the node. This procedure is
-done for all nodes of the graph, for each training epoch. The number
-of layers in the network determine how far the messages are sent. For
-example, for a network with a single layer, each node aggregates the
-embeddings from their immediate neighbors. With 2 layers, the node
-also aggregates embeddings from the neighbors of its immediate
-neighbors and so forth.
+in Figure \ref{fig:gcn-message-passing}, using a fully connected graph
+of 5 nodes as example. During each training epoch, all nodes propagate
+their embedding to their neighbors (illustrated in sub figure (2)).
+The collected embeddings are then aggregated (for example using a sum,
+difference or mean) which becomes the new embedding for the node. Sub
+figure (3) illustrates the resulting graph structure after the
+aggregation procedure. This procedure is done for all nodes of the
+graph, for each training epoch. The number of layers in the network
+determine how far the messages are sent. For example, for a network
+with a single layer, each node aggregates the embeddings from their
+immediate neighbors. With 2 layers, the node also aggregates
+embeddings from the neighbors of its immediate neighbors and so forth.
 
 \section{Data Preparation}
 \label{sec:gcn-data-prep}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{gcn-data.jpg}
+  \caption{Overview of GCN dataset creation procedure.}
+  \label{fig:gcn-data}
+\end{figure}
 
 The graphs for the testing and training of the network are constructed
 from a combination of the main dataset and a modified version of the
@@ -83,23 +87,8 @@ MLP dataset, Figure \ref{fig:gcn-data} illustrates this procedure. A
 fully connected graph is constructed, and its node embeddings and node
 labels are derived from the main dataset. Each node is thus assigned a
 $(x,y,z,t)$ vector as its node embedding. The node is assigned a label
-of 1 if it is an event hit, else a label of 0 to denote noise.
-
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=\textwidth]{gcn-data.jpg}
-  \caption{Overview of GCN dataset creation procedure. \textbf{(1)} an
-    example of the main dataset with 5 hits. \textbf{(2)} the
-    corresponding modified MLP dataset created. Although the dataset
-    will contain $n^{2}-n = 25$ rows, only the unique rows (10 in this
-    example) are shown in the illustration for simplicity.
-    \textbf{(3)} The graph representation is created where rows of (1)
-    become the node embeddings and the label column of (2) become the
-    edge weights.}
-  \label{fig:gcn-data}
-\end{figure}
-
-A modified MLP dataset (see \ref{sec:mlp-data-prep}) with a shape of
+of 1 if it is an event hit, else a label of 0 to denote noise. A
+modified MLP dataset (see \ref{sec:mlp-data-prep}) with a shape of
 \texttt{$(n^{2}-n, 5)$} is created such that each hit is paired with
 all other hits except itself. The label column from this dataset is
 then used as the edge weights of the graph. Edges between event nodes
@@ -116,7 +105,7 @@ is evaluated with 3 test sets, each with varying levels of event
 nodes. In practise, the pipeline will observe timeslices with no to
 very few events, thus the performance of the model on test set 1 and 2
 should be given importance. The various test sets and their
-distribution are summarized in Table \ref{gcn-test-dist}.
+distribution are summarized in Table \ref{tab:gcn-test-dist}.
 
 \begin{table}[htb]
   \centering
@@ -130,7 +119,7 @@ distribution are summarized in Table \ref{gcn-test-dist}.
     \textbf{TS3} & 1000-1500 & 200-250 & 800-1250 \\
     \hline
   \end{tabular}
-  \label{tab:gcn-test-dst}
+  \label{tab:gcn-test-dist}
 \end{table}
 
 \section{Model Description and Evaluation}
@@ -220,16 +209,8 @@ able to learn as clusters of similar nodes are noticed after training.
 
 \begin{figure}[htb]
   \centering
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-train-tsne.png}
-    \caption{TSNE for training set before training.}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-train-tsne-after.png}
-    \caption{TSNE for training set after training.}
-  \end{minipage}
+  \subfloat[Before training.]{\includegraphics[width=0.5\textwidth]{gcd-train-tsne.png}}
+  \subfloat[After training.]{\includegraphics[width=0.5\textwidth]{gcd-train-tsne-after.png}}
   \caption{TSNE for GCN training dataset.}
   \label{fig:gcn-train-tsne}
 \end{figure}
@@ -239,7 +220,7 @@ inability to cluster similar nodes in the testing sets. Very scarce
 communities are observed in TS1 and TS2 with the model only being able
 to cluster the event nodes in TS3. The model is biased to the minority
 class as is seen in the Confusion Matrices depicted in Figure
-\ref{gcn-cm}. The model is able to identify all event nodes in TS2 and
+\ref{fig:gcn-cm}. The model is able to identify all event nodes in TS2 and
 TS3 perfectly however has a high number of FPs in all 3 test sets.
 This indicates that the presence of the high edge weights assigned to
 causally related nodes greatly aids the model in identifying the event
@@ -248,57 +229,22 @@ model does not quite learn to identify the noise nodes.
 
 \begin{figure}[htb]
   \centering
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-cm-no.png}
-    \caption{CM for TS1.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-cm-medium.png}
-    \caption{CM for TS2.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-cm-high.png}
-    \caption{CM for TS3.}
-  \end{minipage}
+  \subfloat[CM for TS1.]{\includegraphics[width=0.33\textwidth]{gcd-cm-no.png}}
+  \subfloat[CM for TS2.]{\includegraphics[width=0.33\textwidth]{gcd-cm-medium.png}}
+  \subfloat[CM for TS3.]{\includegraphics[width=0.33\textwidth]{gcd-cm-high.png}}
   \caption{CM for GCN Test Datasets.}
   \label{fig:gcn-cm}
 \end{figure}
 
 \begin{figure}[htb]
   \centering
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-test-no-tsne.png}
-    \caption{TSNE for TS1 before.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-test-medium-tsne.png}
-    \caption{TSNE for TS2 before.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-test-high-tsne.png}
-    \caption{TSNE for TS3 before.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-test-no-tsne-after.png}
-    \caption{TSNE for TS1 after.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-test-medium-tsne-after.png}
-    \caption{TSNE for TS2 after.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-test-high-tsne-after.png}
-    \caption{TSNE for TS3 after.}
-  \end{minipage}
+  \subfloat[TS1 before.]{\includegraphics[width=0.33\textwidth]{gcd-test-no-tsne.png}}
+  \subfloat[TS2 before.]{\includegraphics[width=0.33\textwidth]{gcd-test-medium-tsne.png}}
+  \subfloat[TS3 before.]{\includegraphics[width=0.33\textwidth]{gcd-test-high-tsne.png}}
+
+  \subfloat[TS1 after.]{\includegraphics[width=0.33\textwidth]{gcd-test-no-tsne-after.png}}
+  \subfloat[TS2 after.]{\includegraphics[width=0.33\textwidth]{gcd-test-medium-tsne-after.png}}
+  \subfloat[TS3 after.]{\includegraphics[width=0.33\textwidth]{gcd-test-high-tsne-after.png}}
   \caption{TSNE for GCN Test Datasets with naive edge weights.}
   \label{fig:gcn-test-tsne}
 \end{figure}

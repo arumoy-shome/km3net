@@ -25,7 +25,7 @@ experimentation is recommended before it is integrated into the Data
 Acquisition Pipeline. The model also showed an increase in the number
 of FPs when the number of positive class examples increased. It may be
 possible to correct this bias by adding some regularization into the
-model \cite{Goodfellow-et-al-2016}.
+model \cite{goodfellow2016deep}.
 
 \begin{table}[htb]
   \centering
@@ -68,42 +68,19 @@ skills for both classes even in the extremely skewed datasets like
 TS2.
 
 \begin{figure}[htb]
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-adv-test-no-tsne-after.png}
-    \caption{TSNE for TS1 with advanced edge weights.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-adv-test-medium-tsne-after.png}
-    \caption{TSNE for TS2 with advanced edge weights.}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-adv-test-high-tsne-after.png}
-    \caption{TSNE for TS3 advanced edge weights.}
-  \end{minipage}
+  \centering
+  \subfloat[TS1 after.]{\includegraphics[width=0.33\textwidth]{gcd-adv-test-no-tsne-after.png}}
+  \subfloat[TS2 after.]{\includegraphics[width=0.33\textwidth]{gcd-adv-test-medium-tsne-after.png}}
+  \subfloat[TS3 after.]{\includegraphics[width=0.33\textwidth]{gcd-adv-test-high-tsne-after.png}}
   \caption{TSNE for GCN test datasets with advanced edge weights.}
   \label{fig:gcn-test-tsne-adv}
 \end{figure}
 
 \begin{figure}[htb]
   \centering
-    \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-adv-cm-no.png}
-    \caption{CM for TS1 (advanced edge weights).}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-adv-cm-medium.png}
-    \caption{CM for TS2 (advanced edge weights).}
-  \end{minipage}
-  \begin{minipage}{0.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{gcd-adv-cm-high.png}
-    \caption{CM for TS3 (advanced edge weights).}
-  \end{minipage}
+  \subfloat[CM for TS1.]{\includegraphics[width=0.33\textwidth]{gcd-adv-cm-no.png}}
+  \subfloat[CM for TS2.]{\includegraphics[width=0.33\textwidth]{gcd-adv-cm-medium.png}}
+  \subfloat[CM for TS3.]{\includegraphics[width=0.33\textwidth]{gcd-adv-cm-high.png}}
   \caption{CM for GCN test datasets with advanced edge weights.}
   \label{fig:gcn-cm-adv}
 \end{figure}
@@ -146,6 +123,15 @@ edge types or regression on the edge weights
 \end{table}
 
 \section{On Independence of the Models}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{gcn-ind.jpg}
+  \caption{Illustration of a possible training set for the graph
+    classification model.}
+  \label{fig:gcn-ind}
+\end{figure}
+      
 There is a high dependency on the Hit Correlation Step by the
 subsequent steps of the GPU Pipeline. The output of the PMC is used by
 these subsequent steps so any shortcomings of the PMC cascade down
@@ -170,18 +156,6 @@ thus should be saved for further analysis. Alternatively, the Line
 Graph Neural Network proposed by Chen et al. (2017) built specifically
 for community detection can also be used.
 
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=\textwidth]{gcn-ind.jpg}
-  \caption{Illustration of a possible training set for the graph
-    classification model. \textbf{(1)} Graphs containing neutrino
-    events can be identified by the presence of small and tightly
-    connected communities. \textbf{(2)} In contrast, graphs containing
-    only noise nodes will only contain large, loosely connected
-    communities}
-  \label{fig:gcn-ind}
-\end{figure}
-
 \section{On the Runtime Performance}
 The models presented in this report were tested in isolation. The
 intended usage however is to use them in tandem in order to identify
@@ -197,9 +171,11 @@ networks can be parallelized using the compute power of GPUs, the
 models should be capable of meeting the requirements. Several existing
 work also indicate the feasibility of scaling GCNs to parallel
 computation over large graphs \cite{ma2019high, ma2019neugraph,
-  zeng2019accurate}, however the data preparation may pose a
-bottleneck. Of course at this point these are merely speculations and
-empirical proof still requires to be gathered.
+  zeng2019accurate}. However the data preparation for the models
+presented in Section \ref{sec:mlp-data-prep} and
+\ref{sec:gcn-data-prep} may pose a bottleneck since they are not
+instantaneous. Of course at this point these are merely speculations
+and empirical proof still requires to be gathered.
 
 % ---------------------------------------------------------------------------
 % ----------------------- end of thesis sub-document ------------------------

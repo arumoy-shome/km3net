@@ -48,7 +48,7 @@ exclusively about KM3NeT/ARCA.
   \end{minipage}
 \end{figure}
 
-\section{Situation of Concern}
+\section{Problem Statement}
 \label{sec:soc}
 
 The ARCA telescope comprises of two ``blocks'' with a total volume of
@@ -124,6 +124,17 @@ answer the following research questions.
 \begin{enumerate}
   \item[\textbf{RQ1}.] \textbf{Can the existing GPU pipeline be improved using Neural Networks?}
 
+    Data exploration presented in Chapter \ref{cha:data} reveals that
+    the dataset is devoid of any correlations and trends amongst the
+    features. Traditional machine learning algorithms will thus
+    require the aid of feature engineering to obtain valuable results.
+    Since an abundance of data is available, the need for feature
+    engineering can be circumvented by using Artificial Neural
+    Networks. This decision is also supported by Chapter
+    \ref{cha:related-work} which presents existing literature
+    showcasing the application of neural networks in the field of
+    Particle Physics.
+
     Improvement may be achieved by reducing the processing time of the
     pipeline or improving the accuracy with which relevant timeslices
     are identified. This project focuses on achieving improvement via
@@ -179,3 +190,4 @@ statistics, linear algebra and optimization. The reader is expected to
 have basic understanding of the guiding principals of Deep Learning
 such as Feed-Forward Neural Networks, backpropagation, binary
 classification and model evaluation metrics.
+

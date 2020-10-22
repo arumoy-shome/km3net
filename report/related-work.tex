@@ -80,7 +80,6 @@ vertex reconstruction} which is a technique used to identify the
 origin of neutrino event using detector data represented as images
 \cite{terwilliger2017vertex}.
 
-%% TODO needs more work, a bit "fika" <- Shru
 All particle physics problem share the problem of having a high noise
 to signal ratio in their datasets and \emph{Machine Learning (ML)}
 techniques have been used to tackle this problem
@@ -125,59 +124,38 @@ processing pipeline to filter timeslices containing neutrino events
 from those containing only noise. The pipeline is able to achieve this
 filtration by processing the data in 3 steps, illustrated in Figure
 \ref{fig:karas-pipeline} and described in more detail below
-\cite{karas2019data}. Figure \ref{fig:karas-pipeline-data} provides a
-visual representation of the various shapes and arrangements of the
-data as it passes through the pipeline.
+\cite{karas2019data}.
 
-\begin{figure}[h]
+\begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{karas-pipeline.jpg}
   \caption{Overview of GPU Pipeline}
   \label{fig:karas-pipeline}
 \end{figure}
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=\textwidth]{karas-pipeline-data.jpg}
-  \caption{\textbf{(1)}. The dataset of the project where each row
-    represents a hit consisting of the $(x, y, z, t) vector$. Here an
-    example set containing 5 hits is shown. \textbf{(2)}. The input to
-    the Hit Correlation Step is all unique pairs of hits.
-    \textbf{(3)}. The output of the Correlation Step is a vector
-    containing the probability that the pairs of hits are related to
-    each other. \textbf{(4)}. (1) and (3) are used to construct a
-    graph representation of the dataset where event (red, orange and
-    blue) and noise (grey) hits are represented as nodes and are
-    connected by an undirected edge carrying as weight the probability
-    of being related (for simplicity, the edges are not shown).
-    \textbf{(5)}. The graph from (4) acts as the input to the Graph
-    Community Detection step, the output of which is another graph
-    where event and noise nodes are grouped together and thus are
-    linearly separable from each other.}
-  \label{fig:karas-pipeline-data}
-\end{figure}
-
 \subsection{The GPU Pipeline by Karas et al. (2019)}
 \label{sec:gpu-pipeline}
-The first step of The GPU pipeline is the Hit Correlation step which
-proposes \emph{The Pattern Matrix Criterion (PMC)} to identify hits
-which may have originated from the same neutrino event, referred to as
-\emph{causally related} hits. From domain knowledge, it is known that
-related hits occur close to each other both in space and time.
-Specifically, the space and time difference of related hits is found
-to be 100m and 300ns respectively \cite{adrian2016letter}. The PMC
-operates by creating a correlation criterion based on the probability
-that the aforementioned space and time difference occurs between two
-related hits. Pairs of hits (from both events and noise) are passed to
-the PMC as input, the output being an adjacency matrix where related
-hits are assigned a high score whilst unrelated hits are assigned a
-lower score. The algorithm is evaluated with a dataset containing 130
-event hits and 5000 noise hits. Results in the range of 0.3 - 0.375
-is reported for the recall, precision and F1 metrics and an accuracy
-of 80\% is achieved. Due to the stocastic nature of hits, unrelated
-hits such as noise-event or noise-noise pairs may occur within this
-predefined range thus being falsely identified as related. This is
-rectified in the next step of the pipeline.
+
+The first step of The GPU pipeline is the Hit
+Correlation step which proposes \emph{The Pattern Matrix Criterion
+(PMC)} to identify hits which may have originated from the same
+neutrino event, referred to as \emph{causally related} hits. From
+domain knowledge, it is known that related hits occur close to each
+other both in space and time. Specifically, the space and time
+difference of related hits is found to be 100m and 300ns respectively
+\cite{adrian2016letter}. The PMC operates by creating a correlation
+criterion based on the probability that the aforementioned space and
+time difference occurs between two related hits. Pairs of hits (from
+both events and noise) are passed to the PMC as input, the output
+being an adjacency matrix where related hits are assigned a high score
+whilst unrelated hits are assigned a lower score. The algorithm is
+evaluated with a dataset containing 130 event hits and 5000 noise
+hits. Results in the range of 0.3 - 0.375 is reported for the recall,
+precision and F1 metrics and an accuracy of 80\% is achieved. Due to
+the stocastic nature of hits, unrelated hits such as noise-event or
+noise-noise pairs may occur within this predefined range thus being
+falsely identified as related. This is rectified in the next step of
+the pipeline.
 
 The second step of the GPU Pipeline is the Graph Community Detection
 (GCD) step. The main dataset is modeled as a graph where hits are
@@ -206,6 +184,31 @@ of the GCD step. The PT and $\gamma$ are grid searched to determine
 their optimal thresholds. All hits above the specified thresholds are
 classified as event communities and the rest as noise communities.
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{karas-pipeline-data.jpg}
+  \caption{Shapes and arrangements of data in the GPU Pipeline.}
+  \label{fig:karas-pipeline-data}
+\end{figure}
+
+Figure \ref{fig:karas-pipeline-data} provides a visual representation
+of the various shapes and arrangements of the data as it passes
+through the pipeline. Sub figure (1) shows an example dataset for the
+pipeline where each row represents a hit consisting of the $(x, y, z,
+t)$ vector. The input to the Hit Correlation Step is all unique pairs
+of hits as shown in sub figure (2). Sub figure (3) shows the output of
+the Correlation Step which is a vector containing the probability that
+the pairs of hits are related to each other. The data from sub figure
+(1) and (3) are used to construct a graph representation of the
+dataset as illustrated in sub figure (4). Event hits (illustrated as
+red, orange and blue circles) and noise hits (grey circles) are
+represented as nodes and are connected by an undirected edge carrying
+as weight the probability of being related. For simplicity, the edges
+are omitted in the figure. The graph from (4) acts as the input to the
+Graph Community Detection step. The output of (4) is shown in sub
+figure (5) which is another graph where event and noise nodes are
+grouped together and thus are linearly separable from each other.
+
 \subsection{Limitations of The GPU Pipeline}
 Although The GPU Pipeline is able to identify timeslices with neutrino
 event hits more accurately compared to its predecessors
@@ -228,14 +231,14 @@ Network can be used to learn the optimal values instead. This idea is
 further explored in Chapter \ref{cha:mlp} where a MLP is used to
 classify related and unrelated hits. The choice of a MLP is motivated
 by existing literature which demonstrates its success with
-signal-noise discrimination. Recently, the field of Geometric Deep
-Learning has gained popularity with some exciting developments of
-models which are designed to operate upon graph structures. Once such
-development is the Graph Convolutional Neural Network (GCN) proposed
-by Kipf et al. (2016). The limitations of the Graph Community
-Detection and Classification steps may be alleviated by using a GCN to
-classify event and noise nodes, and is explored in Chapter
-\ref{cha:gcn}. The choice of a GCN is motivated by the graph data
-structure of the Graph Community Detection step and by existing
-literature that validates the application of GCNs for neutrino
-detection.
+signal-noise discrimination \cite{psihas2020review,
+  mulmule2020machine}. Recently, the field of Geometric Deep Learning
+has gained popularity with some exciting developments of models which
+are designed to operate upon graph structures. Once such development
+is the Graph Convolutional Neural Network (GCN) proposed by Kipf et
+al. (2016). The limitations of the Graph Community Detection and
+Classification steps may be alleviated by using a GCN to classify
+event and noise nodes, and is explored in Chapter \ref{cha:gcn}. The
+choice of a GCN is motivated by the graph data structure of the Graph
+Community Detection step and by existing literature that validates the
+application of GCNs for neutrino detection \cite{choma2018graph}.
