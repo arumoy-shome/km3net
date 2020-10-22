@@ -7,7 +7,7 @@
 % 
 
 This chapter presents the replacement created using a Graph
-Convolusional Neural Networks (GCNs) as proposed by Kipf et al. (2016)
+Convolutional Neural Networks (GCNs) as proposed by Kipf et al. (2016)
 for the \emph{Graph Community Detection Step} of the GPU Pipeline. It
 is observed that a GCN is able to identify event nodes very well
 however is severely biased to them thus unable to distinguish between
@@ -16,7 +16,7 @@ and how they have been applied to this problem. The data preparation
 and model evaluation are touched upon next. The chapter concludes with
 discussion of the results.
 
-\section{Primer on Graph Convolusional Neural Networks}
+\section{Primer on Graph Convolutional Neural Networks}
 \label{sec:gcn-primer}
 
 GCNs are designed to operate on data consisting of entities and their
@@ -160,9 +160,9 @@ parameters remains the same as that of the MLP model (see
 \ref{sec:mlp-model-desc}) since both models perform binary
 classification. The difference comes from the model architecture which
 is summarized in Table \ref{tab:gcn-model-arch}. The GCN model
-comprises of an input layer, two graph convolusional layers and an
+comprises of an input layer, two graph convolutional layers and an
 output layer. The network is fully connected with 4 neurons in the
-input layer, 16 in both graph convolusional layers and 1 neuron in the
+input layer, 16 in both graph convolutional layers and 1 neuron in the
 output layer. A dropout layer is added between the two Gconv layers to
 prevent overfitting \cite{srivastava14dropout}. The same evaluation
 metrics are used (see Section \ref{sec:mlp-model-eval}) since the GCN
