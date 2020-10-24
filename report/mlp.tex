@@ -40,7 +40,7 @@ As an example, a main dataset containing 5 rows is shown in sub figure
 (1). The MLP dataset is generated from the main dataset and consists
 of all unique pairs of hits. With an input data of shape $(n, 4)$
 (\emph{n} rows and 4 columns representing \emph{x, y, z, and t}), an
-output data of shape \texttt{($\sum_{k=n-1}^{1}k$, 9)} is obtained.
+output data of shape $((\frac{n}{2}), 9)$ is obtained.
 Algorithmically, this is done by pairing each hit with the subsequent
 hits below it as demonstrated with the use of colors in sub figure
 (2). The output dataset consists of 9 columns due to the presence of
@@ -53,7 +53,7 @@ to each other. If the event id of the two hits are not the same then
 they are assigned a label of 0. Better model performance was observed
 when the model was trained with the difference between hits in time
 and space. Sub figure (3) shows the final dataset of shape
-($\sum_{k=n-1}^{1}k$, 5) obtained - the first 4 columns being the
+$((\frac{n}{2}), 5)$ obtained - the first 4 columns being the
 difference of \emph{x, y, z and t} vectors of the paired hits and the
 last column being the label. The data is additionally scaled between
 $[0,1]$ due to empirical evidence showing improvement of model
@@ -339,7 +339,7 @@ a better FP:TP ratio (see Figure \ref{fig:mlp-cm}).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.5\textwidth]{mlp-learning.png}
+  \includegraphics[width=0.5\textwidth]{mlp-learning.jpg}
   \caption{Learning Curve of MLP Training and Validation Datasets.}
   \label{fig:mlp-learning}
 \end{figure}

@@ -8,7 +8,7 @@
 %
 
 This chapter presents practical recommendations for the readers who
-wish to use the new data processing pipeline presented in this report.
+wish to use the new data processing pipeline presented in this thesis.
 The chapter also presents alternative paths of research which remain
 unexplored and general improvements that can be made to the pipeline
 in the future.
@@ -145,7 +145,7 @@ data can be framed such that the $(x, y, z)$ vectors are used as the
 node embedding. If the \emph{t} is scaled between $[0, 1]$ and the
 complement of $\Delta t$ is assigned as the edge weights, it should
 result in a graph where edges between causally related nodes carry a
-high weight. After convolusion, a reasonable expectation is the
+high weight. After convolution, a reasonable expectation is the
 presence of small and tightly connected communities of causally
 related nodes and large, weakly connected communities of noise nodes
 (illustrated in Figure \ref{fig:gcn-ind}). The GCN model can now be
@@ -157,7 +157,7 @@ Graph Neural Network proposed by Chen et al. (2017) built specifically
 for community detection can also be used.
 
 \section{On the Runtime Performance}
-The models presented in this report were tested in isolation. The
+The models presented in this thesis were tested in isolation. The
 intended usage however is to use them in tandem in order to identify
 timeslices containing neutrino event hits. Thus it is recommended that
 the models be tested as an integrated pipeline so that the results may

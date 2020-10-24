@@ -11,9 +11,9 @@ Convolutional Neural Networks (GCNs) as proposed by Kipf et al. (2016)
 for the \emph{Graph Community Detection Step} of the GPU Pipeline. It
 is observed that a GCN is able to identify event nodes very well
 however is severely biased to them thus unable to distinguish between
-event from noise nodes. The chapter begins with an overview of GCNs
-and how they have been applied to this problem. The data preparation
-and model evaluation are touched upon next. The chapter concludes with
+event and noise nodes. The chapter begins with an overview of GCNs and
+how they have been applied to this problem. The data preparation and
+model evaluation are touched upon next. The chapter concludes with
 discussion of the results.
 
 \section{Primer on Graph Convolutional Neural Networks}
@@ -64,12 +64,14 @@ their embedding to their neighbors (illustrated in sub figure (2)).
 The collected embeddings are then aggregated (for example using a sum,
 difference or mean) which becomes the new embedding for the node. Sub
 figure (3) illustrates the resulting graph structure after the
-aggregation procedure. This procedure is done for all nodes of the
-graph, for each training epoch. The number of layers in the network
-determine how far the messages are sent. For example, for a network
-with a single layer, each node aggregates the embeddings from their
-immediate neighbors. With 2 layers, the node also aggregates
-embeddings from the neighbors of its immediate neighbors and so forth.
+aggregation procedure. If an embedding is propagated through an edge
+carrying a weight then the embedding is scaled by that value. This
+procedure is done for all nodes of the graph, for each training epoch.
+The number of layers in the network determine how far the messages are
+sent. For example, for a network with a single layer, each node
+aggregates the embeddings from their immediate neighbors. With 2
+layers, the node also aggregates embeddings from the neighbors of its
+immediate neighbors and so forth.
 
 \section{Data Preparation}
 \label{sec:gcn-data-prep}
@@ -83,17 +85,22 @@ embeddings from the neighbors of its immediate neighbors and so forth.
 
 The graphs for the testing and training of the network are constructed
 from a combination of the main dataset and a modified version of the
-MLP dataset, Figure \ref{fig:gcn-data} illustrates this procedure. A
-fully connected graph is constructed, and its node embeddings and node
-labels are derived from the main dataset. Each node is thus assigned a
-$(x,y,z,t)$ vector as its node embedding. The node is assigned a label
-of 1 if it is an event hit, else a label of 0 to denote noise. A
-modified MLP dataset (see \ref{sec:mlp-data-prep}) with a shape of
-\texttt{$(n^{2}-n, 5)$} is created such that each hit is paired with
-all other hits except itself. The label column from this dataset is
-then used as the edge weights of the graph. Edges between event nodes
-from the same event thus are assigned a weight of 1 and all other
-edges are assigned a weight of 0.
+MLP dataset, Figure \ref{fig:gcn-data} illustrates this procedure. As
+observed in Section \ref{sec:mlp-disc} Figure \ref{fig:mlp-cm}, the
+MLP model predictions contain false negatives. Using the predictions,
+a graph can be constructed such that only related nodes are connected.
+This however would lead to the total loss of the event hits which were
+incorrectly classified as noise. Thus a fully connected graph is
+constructed, and its node embeddings and node labels are derived from
+the main dataset. Each node is assigned a $(x,y,z,t)$ vector as its
+node embedding. The node is assigned a label of 1 if it is an event
+hit, else a label of 0 to denote noise. A modified MLP dataset (see
+\ref{sec:mlp-data-prep}) with a shape of \texttt{$(n^{2}-n, 5)$} is
+created such that each hit is paired with all other hits except
+itself. The label column from this dataset is then used as the edge
+weights of the graph. Edges between event nodes from the same event
+thus are assigned a weight of 1 and all other edges are assigned a
+weight of 0.
 
 Since the main dataset and the MLP dataset are highly skewed, the GCN
 dataset is also skewed with majority of the nodes being noise. Similar
@@ -178,7 +185,7 @@ dataset is also highly skewed in nature.
 
 \begin{figure}[htb]
   \centering
-    \includegraphics[width=0.5\textwidth]{gcd-learning.png}
+    \includegraphics[width=0.5\textwidth]{gcn-learning.jpg}
     \caption{Learning Curve for GCN.}
   \label{fig:gcn-learning}
 \end{figure}
