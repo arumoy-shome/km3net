@@ -29,3 +29,16 @@ The directory structure of the project along with a brief description is present
 ```
 
 The intended way of using this codebase is through Jupyter notebooks since it makes it easy to view code, visualizations and text in a single view. Further documentation for each module can be found in the python files and in the method doc strings. Please view one of the notebooks for example usage.
+
+## Cite
+
+Please do not forget to cite this work if you use it in your own research.
+
+```bibtex
+@MastersThesis{shome2020km3net,
+  author =       {Arumoy Shome},
+  title =        {KM3NeT Neutrino Detection using Deep Learning},
+  school =       {Vrije Universiteit - Universiteit van Amsterdam},
+  year =         {2020}
+}
+```
