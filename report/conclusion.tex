@@ -16,21 +16,26 @@ questions \textbf{RQ2} and \textbf{RQ3} are answered first followed by
 \begin{enumerate}
 \item[\textbf{RQ2.}] \textbf{Can the \emph{Hit Correlation Step} be replaced with a Multi Layer Perceptron?}
 
-  The first phase of this project focused on improving the Hit
-  Correlation Step of the GPU Pipeline using a Multi Layer Perception.
-  In Chapter \ref{cha:mlp} the training and evaluation of such a model
-  was presented. The model outperformed the existing Pattern Matrix
+  The Hit Correlation Step can be replaced with a Multi Layer
+  Perceptron to identify causally related hits. The first phase of
+  this project focused on improving the Hit Correlation Step of the
+  GPU Pipeline using a Multi Layer Perception. In Chapter
+  \ref{cha:mlp} the training and evaluation of such a model was
+  presented. The model outperformed the existing Pattern Matrix
   Criterion and was able to identify causally related hits with higher
   accuracy, precision and recall in highly skewed test sets.
 
 \item[\textbf{RQ3.}] \textbf{Can the \emph{Graph Community Detection Step} be replaced with a Graph Convolutional Neural Network?}
 
-  The outcomes of the second phase of this project were described in
-  Chapter \ref{cha:gcn}. Here, the Graph Convolutional Neural Network
-  to replace the Graph Community Detection and the Classification Step
-  of the GPU Pipeline was presented. The performance of the model was
-  not ideal since it was biased to the positive class and unable to
-  identify the negative class in the test sets.
+  This research question remains open for further exploration due to
+  the inconclusive results obtained from experiments conducted in this
+  thesis. The outcomes of the second phase of this project were
+  described in Chapter \ref{cha:gcn}. Here, the Graph Convolutional
+  Neural Network to replace the Graph Community Detection and the
+  Classification Step of the GPU Pipeline was presented. The
+  performance of the model was not ideal since it was biased to the
+  positive class and unable to identify the negative class in the test
+  sets.
 
 \item[\textbf{RQ1}.] \textbf{Can the existing GPU pipeline be improved using Neural Networks?}
 
@@ -43,6 +48,62 @@ questions \textbf{RQ2} and \textbf{RQ3} are answered first followed by
   used to improve the performance of the existing GPU Pipeline.
 \end{enumerate}
 
+Although the outcomes of this thesis are deemed successful, a few key
+challenges faced along the way are worth reflecting upon. Existing
+literature recommends the use of precision-recall curves to evaluate
+the model performance for skewed datasets. For the KM3NeT dataset
+however, this was not the ideal metric due to the severely skewed
+distribution of the classes. Most timeslices consist of noise hits in
+the order of millions but less than a hundred event hits. This yields
+an extremely low precision, even if the model has only a thousand
+false positives which is not bad overall.
+
+A rise in the number of false negatives was noticed in the MLP model
+with an increase of positive class examples (see Section
+\ref{sec:mlp-disc} and Figure \ref{fig:mlp-cm}}). This is a cause for
+concern since these are causally related hits which will be filtered
+out, resulting in loss of important data for future research. For the
+GCN model, a solution to fix the bias was proposed in Section
+\ref{sec:rec-gcn} that requires the data to be modeled as a
+heterogeneous graph. This can be computationally expensive and
+complicates the data preparation procedure. The solution to both
+problems stated above is seen in the recommendation proposed in
+Section \ref{sec:rec-ind}. The recommendation proposed a single GCN
+model to power the entire pipeline using a data preparation
+methodology that persists the homogeneous graph structure and renders
+the MLP model obsolete altogether.
+
+The \emph{Pytorch Geometric} library was used to construct the graph
+neural networks implemented in this thesis. Although this library is
+being actively developed and has the support of a healthy open source
+community, documentation and support from the maintainers was felt to
+be lacking. The \emph{Viltstift} compute cluster provided by Nikhef
+was used in this thesis which contained \emph{AMD} GPUs requiring
+Pytorch to be built from source. Due to the lack of support for AMD
+GPUs in Pytorch Geometric, all experiments pertaining to the GCN model
+were conducted on \emph{Google Colab}. Additional restrictions on
+memory and disk space posed by Google Colab limited the scale of
+experiments to small graphs consisting of no more than 1000 nodes.
+Although the small scale experiments sufficiently demonstrated the
+promising role of Graph Neural Networks in neutrino detection, the
+need for more large scale experiments is observed.
+
+The KM3NeT research initiative seeks to unravel the mysteries of the
+Earth and the Universe by studying the elusive neutrino particles. The
+Data Acquisition Pipeline (DAP) plays a critical role in this
+multi-million euro project since all research efforts hinge upon a
+sole component - the data. The data collected through the DAP dictates
+the quality and value of all future research thus it must be able to
+filter out noise with unparalleled speed and accuracy. This thesis
+presented research which can aid in this endeavor using Deep Learning.
+It is one of the very few research projects within the KM3NeT sphere
+to apply Deep Learning to the field of Particle Physics. It is also
+amongst a handful of projects that explore the application of Graph
+Neural Networks for neutrino detection. This thesis hopes to have
+sufficiently contributed towards the development of the next
+generation event trigger algorithms. Being one of the few to apply
+Graph Neural Networks for neutrino detection, this thesis hopes to
+have laid the foundation for future graph based applications.
 
 % ---------------------------------------------------------------------------
 % ----------------------- end of thesis sub-document ------------------------

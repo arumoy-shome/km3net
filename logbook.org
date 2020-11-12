@@ -243,6 +243,33 @@
   This section describes the strategies explored to replace the /Graph
   Community Detection/ step for the existing data processing pipeline.
 
+** Edge weights in GNNs
+   According to the Deep Graph Library, the edge weights are
+   incorporated differently in models. The general method is to scale
+   the node embedding propagating through it.
+
+   This means, with the naive edge weight scheme, unrelated nodes do
+   not exchange embeddings (embedding gets multiplied by 0). This
+   caused two questions in my mind:
+
+   + does the advanced edge weights work simply because all nodes are
+     now exchanging their node embeddings?
+   + and second, if unrelated nodes do not exchange their embeddings
+     with naive edge weights, then how are their communities in the
+     training set?
+
+   It is possible that the network implementation I am using is not
+   scaling the embeddings by the edge weight. I tried to dig into the
+   =GCNConv= implementation that pytorch geometric is using but could
+   not decipher anything.
+
+   In hindsight, I suppose I should have experimented with the
+   expected probability of positive class as edge weights before
+   jumping to advanced weights. Generating the probabilities
+   synthetically would have been hard and the only difference with
+   advanced weight scheme is that noise-noise pairs are also assigned
+   a high edge weight. 
+     
 ** CANCELLED Why we do not need graphConv
    :LOGBOOK:
    - State "CANCELLED"  from "TODO"       [2020-09-14 Mon 20:40] \\
